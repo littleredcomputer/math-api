@@ -68,6 +68,11 @@
     <build>
         <!-- for hot reload of the web application-->
         <outputDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF/classes</outputDirectory>
+        <resources>
+            <resource>
+                <directory>src/main/clojure</directory>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -132,7 +137,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <sourceDirectories>
-                        <sourceDirectory>src/main/clj</sourceDirectory>
+                        <sourceDirectory>src/main/clojure</sourceDirectory>
                     </sourceDirectories>
                 </configuration>
                 <executions>
