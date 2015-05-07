@@ -15,7 +15,6 @@ public class HelloServlet extends HttpServlet {
   @Override public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
     final IFn require = Clojure.var("clojure.core", "require");
     require.invoke(Clojure.read("math.euclid"));
-    require.invoke(Clojure.read("math.start"));
     require.invoke(Clojure.read("math.examples.figure-1-7"));
     final IFn euc = Clojure.var("math.euclid", "extended-gcd");
     final IFn ex = Clojure.var("math.examples.figure-1-7", "evolve-pendulum");
