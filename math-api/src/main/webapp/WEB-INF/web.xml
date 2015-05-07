@@ -9,8 +9,8 @@
         <servlet-class>net.littleredcomputer.math.api.HowdyServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>foo</servlet-name>
-        <servlet-class>net.littleredcomputer.math.api.foo</servlet-class>
+        <servlet-name>pendulum</servlet-name>
+        <servlet-class>net.littleredcomputer.math.api.pendulum</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>hello</servlet-name>
@@ -21,7 +21,7 @@
         <url-pattern>/howdy</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>foo</servlet-name>
-        <url-pattern>/foo/*</url-pattern>
+        <servlet-name>pendulum</servlet-name>
+        <url-pattern>/api/sicm/pendulum/*</url-pattern>
     </servlet-mapping>
 </web-app>

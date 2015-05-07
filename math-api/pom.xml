@@ -164,6 +164,10 @@
                     <!-- jvmFlags>
                       <jvmFlag>-agentlib:jdwp=transport=dt_socket,address=8000,server=y,suspend=n</jvmFlag>
                     </jvmFlags -->
+                    <jvmFlags>
+                        <jvmFlag>-verbose:class</jvmFlag>
+                        <jvmFlag>-Dclojure.core.loading-verbosely=true</jvmFlag>
+                    </jvmFlags>
                 </configuration>
             </plugin>
             <plugin>
