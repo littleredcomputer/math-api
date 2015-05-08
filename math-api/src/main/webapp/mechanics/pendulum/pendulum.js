@@ -1,12 +1,11 @@
 angular.module('DrivenPendulum', ['ngMaterial', 'ngSanitize'])
-.controller('PendulumCtrl', ['$http', '$q', function($http, $q) {
+.controller('PendulumCtrl', ['$http', function($http) {
   this.go = function() {
     console.log('go!', this);
     var url_params = {};
-    for (var pi = 0; pi < this.parameters.length; ++pi) {
-      var p = this.parameters[pi];
-      url_params[p.name] = p.value;
-    }
+    angular.forEach(this.parameters, function(value) {
+      url_params[value.name] = value.value;
+    });
     console.log(url_params);
     $http.get('/api/sicm/pendulum/evolve',
               {params: url_params}).success(function(data) {
@@ -29,10 +28,10 @@ angular.module('DrivenPendulum', ['ngMaterial', 'ngSanitize'])
                       value: 0},
                      {nameHtml: 'ω',
                       name: 'omega',
-                      min: -2,
+                      min: 0,
                       max: 15,
                       step: 0.1,
-                      value: 9.8},
+                      value: 2*Math.sqrt(9.8)},
                      {nameHtml: 'g',
                       name: 'g',
                       min: -2,
