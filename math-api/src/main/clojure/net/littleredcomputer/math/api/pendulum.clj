@@ -1,5 +1,5 @@
 (ns net.littleredcomputer.math.api.pendulum
-  (:require [math.examples.figure-1-7]
+  (:require [math.examples.figure-1-7 :refer [evolve-pendulum]]
             [ring.util.response :refer [response]]
             [ring.util.servlet :refer [defservice]]
             [clojure.tools.logging :as log]

@@ -1,0 +1,11 @@
+path.domain {
+  stroke-width: 1px;
+  stroke: #888;
+  fill: none;
+}
+
+line.pendulum-strut {
+  stroke-width: 3px;
+  stroke: #444;
+  fill: #888;
+}
