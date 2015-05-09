@@ -71,32 +71,37 @@ function draw(data, t) {
     .attr('class', 'pendulum-strut')
     .attr('x1', dx_scale(0));
 
-  var spot = anim.append('circle')
-    .attr('fill','red')
-    .attr('cx', dx_scale(0))
-    .attr('cy', dy_scale(0))
-    .attr('r', 3);
+  var pivot = anim.append('circle')
+    .attr('class', 'pendulum-pivot')
+    .attr('r', 4)
+    .attr('cx', dx_scale(0));
 
-  var bot = anim.append('circle')
-    .attr('fill','blue')
-    .attr('cx', dx_scale(0))
-    .attr('cy', dy_scale(-1))
-    .attr('r', 3);
-
-  var rt = anim.append('circle')
-    .attr('fill', 'green')
-    .attr('cx', dx_scale(1))
-    .attr('cy', dy_scale(0))
-    .attr('r', 3);
+  var bob = anim.append('circle')
+    .attr('r', 10)
+    .attr('class', 'pendulum-bob');
 
   for (var i = 0; i < data.length; ++i) {
     var d = data[i];
+    var delay = d[0] * 1000.,
+      y1 = dy_scale(d[2]),
+      x2 = dx_scale(Math.sin(d[1])),
+      y2 = dy_scale(-Math.cos(d[1]) + d[2]);
+
     strut.transition()
-      .delay(d[0] * 1000.)
-      .duration(0)
-      .attr('y1', dy_scale(d[2]))
-      .attr('x2', dx_scale(Math.sin(d[1])))
-      .attr('y2', dy_scale(-Math.cos(d[1]) + d[2]));
+      .delay(delay)
+      .duration(10)
+      .attr('y1', y1)
+      .attr('x2', x2)
+      .attr('y2', y2);
+    pivot.transition()
+      .delay(delay)
+      .duration(10)
+      .attr('cy', y1);
+    bob.transition()
+      .delay(delay)
+      .duration(10)
+      .attr('cx', x2)
+      .attr('cy', y2);
   }
 }
 
@@ -110,7 +115,7 @@ angular.module('DrivenPendulum', ['ngMaterial', 'ngSanitize'])
       });
       $http.get('/api/sicm/pendulum/evolve', {params: url_params})
         .success(function(data) {
-          console.log('OK', data);
+          console.log('OK');
           draw(data, url_params.t);
         }).error(function(data, status) {
           console.log('ERR', data, status);
@@ -119,13 +124,12 @@ angular.module('DrivenPendulum', ['ngMaterial', 'ngSanitize'])
     this.parameters = [
       {nameHtml: 'θ<sub>0</sub>', name: 'theta0', min: -3.1416, max: 3.1416, step: 0.1, value: 1},
       {nameHtml: 'θ&#x307;<sub>0</sub>', name: 'thetaDot0', min: -3, max: 3, step: 0.1, value: 0},
-      {nameHtml: 'ω', name: 'omega', min: 0, max: 15, step: 0.1, value: 2*Math.sqrt(9.8)},
+      {nameHtml: 'ω', name: 'omega', min: 0, max: 200, step: 0.1, value: 2*Math.sqrt(9.8)},
       {nameHtml: 'g', name: 'g', min: -2, max: 15, step: 0.1, value: 9.8},
-      {nameHtml: 'A', name: 'A', min: 0, max: 1, step: 0.05, value: 0.1},
+      {nameHtml: 'A', name: 'A', min: 0, max: 0.5, step: 0.05, value: 0.1},
       {nameHtml: 't', name: 't', min: 1, max: 100, step: 2, value: 25}];
   }])
   .directive('valueSliders', function() {
-    console.log('valuesliders');
     return {
       restrict: 'E',
       templateUrl: 'value-sliders.html'

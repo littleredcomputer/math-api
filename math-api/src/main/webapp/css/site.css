@@ -9,3 +9,11 @@ line.pendulum-strut {
   stroke: #444;
   fill: #888;
 }
+
+circle.pendulum-pivot {
+  fill: #040;
+}
+
+circle.pendulum-bob {
+  fill: black;
+}
