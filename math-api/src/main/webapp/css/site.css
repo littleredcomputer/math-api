@@ -17,3 +17,11 @@ circle.pendulum-pivot {
 circle.pendulum-bob {
   fill: black;
 }
+
+circle.graph-point.phi {
+  opacity: 0.5;
+}
+
+circle.graph-point.theta {
+  opacity: 0.5;
+}

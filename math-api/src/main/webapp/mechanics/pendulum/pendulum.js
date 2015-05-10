@@ -32,7 +32,8 @@ function draw_driven(data, t) {
   svg.append('g')
     .attr('class', 'y_axis')
     .call(y_axis);
-  var circles = svg.selectAll('circle')
+
+  svg.selectAll('circle')
     .data(data)
     .enter()
     .append('circle')
@@ -138,7 +139,7 @@ function draw_double(data, parameters) {
     .attr('class', 'y_axis')
     .call(y_axis);
 
-  var thetaCircles = svg.selectAll('circle.theta')
+  svg.selectAll('circle.theta')
     .data(data)
     .enter()
     .append('circle')
@@ -153,8 +154,7 @@ function draw_double(data, parameters) {
       }
       return y_scale(y2);
     })
-    .attr('class', 'graph-point')
-    .attr('class', 'theta')
+    .classed('graph-point theta', true)
     .attr('r', 1)
     .style('fill', '#400')
     .transition()
@@ -167,7 +167,7 @@ function draw_double(data, parameters) {
     .style('fill', '#400')
     .attr('r', 1);
 
-  var phiCircles = svg.selectAll('circle.phi')
+  svg.selectAll('circle.phi')
     .data(data)
     .enter()
     .append('circle')
@@ -182,8 +182,7 @@ function draw_double(data, parameters) {
       }
       return y_scale(y2);
     })
-    .attr('class', 'graph-point')
-    .attr('class', 'phi')
+    .classed('graph-point phi', true)
     .attr('r', 1)
     .style('fill', '#040')
     .transition()
@@ -264,9 +263,10 @@ function draw_double(data, parameters) {
 
 angular.module('Pendulum', ['ngMaterial', 'ngSanitize'])
   .controller('DrivenPendulumCtrl', ['$scope', '$http', function($scope, $http) {
-    $scope.$watch(angular.bind(this, function() {
-      return this.parameters[0].value;
-    }), function(new_value, old_value) {
+    var self = this;
+    $scope.$watch(function() {
+      return self.parameters[0].value;
+    }, function(new_value, old_value) {
         console.log('watch!', old_value, '->', new_value);
     });
     this.go = function() {
