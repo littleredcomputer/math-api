@@ -61,23 +61,23 @@ function draw_driven(data, t) {
     .attr('r', 1);
 
   d3.select('#pendulum-animation svg').remove();
-  var anim = d3.select('#pendulum-animation')
+  var animation = d3.select('#pendulum-animation')
     .append('svg')
     .attr('width', cWidth)
     .attr('height', cHeight)
     .append('g')
     .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
-  var strut = anim.append('line')
+  var strut = animation.append('line')
     .attr('class', 'pendulum-strut')
     .attr('x1', dx_scale(0));
 
-  var pivot = anim.append('circle')
+  var pivot = animation.append('circle')
     .attr('class', 'pendulum-pivot')
     .attr('r', 4)
     .attr('cx', dx_scale(0));
 
-  var bob = anim.append('circle')
+  var bob = animation.append('circle')
     .attr('r', 10)
     .attr('class', 'pendulum-bob');
 
@@ -196,41 +196,41 @@ function draw_double(data, parameters) {
     .attr('r', 1);
 
   d3.select('#pendulum-animation svg').remove();
-  var anim = d3.select('#pendulum-animation')
+  var animation = d3.select('#pendulum-animation')
     .append('svg')
     .attr('width', cWidth)
     .attr('height', cHeight)
     .append('g')
     .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
-  var strut1 = anim.append('line')
+  var strut1 = animation.append('line')
     .attr('class', 'pendulum-strut')
     .attr('x1', dx_scale(0))
     .attr('y1', dx_scale(0));
 
-  var strut2 = anim.append('line')
+  var strut2 = animation.append('line')
     .attr('class', 'pendulum-strut');
 
-  var pivot = anim.append('circle')
+  var pivot = animation.append('circle')
     .attr('class', 'pendulum-pivot')
     .attr('r', 4)
     .attr('cx', dx_scale(0))
     .attr('cy', dy_scale(0));
 
-  var bob1 = anim.append('circle')
+  var bob1 = animation.append('circle')
     .attr('r', 10)
     .attr('class', 'pendulum-bob');
 
-  var bob2 = anim.append('circle')
+  var bob2 = animation.append('circle')
     .attr('r', 10)
     .attr('class', 'pendulum-bob');
 
   for (var i = 0; i < data.length; ++i) {
     var d = data[i];
     var delay = d[0] * 1000.,
-      xa = parameters.l1 * Math.sin(d[1]),
+      xa = parameters['l1'] * Math.sin(d[1]),
       xA = dx_scale(xa),
-      ya = - parameters.l1 * Math.cos(d[1]),
+      ya = - parameters['l1'] * Math.cos(d[1]),
       yA = dy_scale(ya),
       xB = dx_scale(xa + parameters.l2 * Math.sin(d[2])),
       yB = dy_scale(ya - parameters.l2 * Math.cos(d[2]));
@@ -314,7 +314,7 @@ angular.module('Pendulum', ['ngMaterial', 'ngSanitize'])
       angular.forEach(this.parameters, function(p) {
         url_params[p.name] = p.value;
       });
-      url_params.l2 = 1 - url_params.l1;
+      url_params.l2 = 1 - url_params['l1'];
       $http.get('/api/sicm/pendulum/double/evolve', {params: url_params})
         .success(function(data) {
           console.log('OK');
