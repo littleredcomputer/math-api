@@ -37,7 +37,7 @@
                                              (* (((expt D 2) φ) t) (expt l2 2) m2)
                                              (* (sin (φ t)) g l2 m2)))
                                    (simplify (((Lagrange-equations
-                                                 (L-double-pend 'm1 'm2 'l1 'l2 'g 0))
+                                                 (L-double-pend 'm1 'm2 'l1 'l2 'g))
                                                 (up θ φ))
                                                't)))))
     (is (evolve-double-pendulum 1 9.8 1 0.4 1 0 2 0.6 -1 0))))
