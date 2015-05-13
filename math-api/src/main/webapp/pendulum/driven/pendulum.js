@@ -281,7 +281,7 @@ angular.module('Pendulum', ['ngMaterial', 'ngSanitize'])
       angular.forEach(this.parameters, function(p) {
         url_params[p.name] = p.value;
       });
-      $http.get('/api/sicm/pendulum/evolve', {params: url_params})
+      $http.get('/api/sicm/pendulum/driven/evolve', {params: url_params})
         .success(function(data) {
           draw_driven(data, url_params.t);
         }).error(function(data, status) {
