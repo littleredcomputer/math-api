@@ -18,6 +18,14 @@ circle.pendulum-bob {
   fill: black;
 }
 
+circle.pendulum-bob.theta {
+  fill: #a00;
+}
+
+circle.pendulum-bob.phi {
+  fill: #0a0;
+}
+
 circle.graph-point.phi {
   opacity: 0.5;
 }

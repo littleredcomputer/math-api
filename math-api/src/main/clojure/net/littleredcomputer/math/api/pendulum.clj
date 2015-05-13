@@ -1,19 +1,21 @@
 (ns net.littleredcomputer.math.api.pendulum
-  (:require [ring.util.response :refer [response]]
-            [ring.util.servlet :refer [defservice]]
-            [clojure.tools.logging :as log]
-            [ring.middleware.defaults :refer [wrap-defaults api-defaults]]
-            [ring.middleware.json :refer [wrap-json-response]]
+  (:require [clojure.tools.logging :as log]
+            [ring.util
+             [response :refer [response]]
+             [servlet :refer [defservice]]]
+            [ring.middleware
+             [defaults :refer [wrap-defaults api-defaults]]
+             [json :refer [wrap-json-response]]]
             [compojure.core :refer [defroutes GET POST]]
             [hiccup.core :refer :all]
-            [net.littleredcomputer.math.examples.driven-pendulum :refer [evolve-pendulum]]
-            [net.littleredcomputer.math.examples.double-pendulum :refer [evolve-double-pendulum]])
+            [net.littleredcomputer.math.examples
+             [driven-pendulum :refer [evolve-pendulum]]
+             [double-pendulum :refer [evolve-double-pendulum]]])
   (:import [com.google.appengine.api.memcache MemcacheServiceFactory MemcacheService])
   (:gen-class :extends javax.servlet.http.HttpServlet))
 
 (def ^MemcacheService memcache-service (MemcacheServiceFactory/getMemcacheService))
 
-(math.euclid/gcd 3 3)
 (defroutes
   pendulum
   (GET "/api/sicm/pendulum/evolve" {params :params}

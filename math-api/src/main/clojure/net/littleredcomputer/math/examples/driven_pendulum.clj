@@ -43,6 +43,6 @@
      (fn [t [_ q _]] (swap! state-history conj [t q (drive t)]))
      0.01
      t
-     1.0e-13
+     1.0e-6
      {:compile true})
     @state-history))

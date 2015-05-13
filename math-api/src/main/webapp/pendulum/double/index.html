@@ -16,13 +16,24 @@
         <md-content layout="column" flex class="md-padding">
           <div layout="row" flex>
             <div layout="column" flex=66>
-              <div layout flex id="pendulum-animation" style="height: 400px; border:1px solid #ccc; margin-right: 10px"></div>
+              <div layout flex id="pendulum-animation" style="height: 400px; border:1px solid #ccc; margin-right: 10px">
+                <svg>
+                  <g id="pendulum-frame">
+                    <line id="strut1" class="pendulum-strut"></line>
+                    <line id="strut2" class="pendulum-strut"></line>
+                    <circle id="pivot" class="pendulum-pivot" r="4"></circle>
+                    <circle id="bob1" class="pendulum-bob theta" r="8"></circle>
+                    <circle id="bob2" class="pendulum-bob phi" r="8"></circle>
+                  </g>
+                </svg>
+              </div>
               <div layout flex id="pendulum-graph" style="height:400px; border: 1px solid #ccc; margin-right: 10px; margin-top: 10px;"></div>
             </div>
             <div layout="column" flex=33>
               <value-sliders></value-sliders>
               <md-button ng-click="pend.go();" class="md-fab">Go</md-button>
               <!-- span ng-cloak ng-repeat="p in pend.parameters">{{ p.value | number:2 }}</span -->
+
             </div>
           </div>
         </md-content>
@@ -35,6 +46,6 @@
     <script src="https://ajax.googleapis.com/ajax/libs/angular_material/0.8.3/angular-material.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
     <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
-    <script src="../pendulum.js"></script>
+    <script src="../driven/pendulum.js"></script>
   </body>
 </html>
