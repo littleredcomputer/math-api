@@ -5,7 +5,7 @@
     <threadsafe>true</threadsafe>
     
     <system-properties>
-        <property name="java.util.logging.config.file" value="WEB-INF/classes/log4j.properties"/>
+        <property name="java.util.logging.config.file" value="WEB-INF/logging.properties"/>
         <property name="clojure.core.loading-verbosely" value="true"/>
         <property name="clojure.core.warn-on-reflection" value="true"/>
     </system-properties>

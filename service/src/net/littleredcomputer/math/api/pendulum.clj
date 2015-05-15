@@ -58,3 +58,6 @@
 (defservice (-> pendulum
                 wrap-json-response
                 (wrap-defaults api-defaults)))
+
+(defn -main [& args]
+  (println "HW"))
