@@ -4,6 +4,9 @@
     <modelVersion>4.0.0</modelVersion>
     <packaging>war</packaging>
     <version>1.0-SNAPSHOT</version>
+    <modules>
+        <module>math-service</module>
+    </modules>
 
     <groupId>net.littleredcomputer.math.api</groupId>
     <artifactId>math-api</artifactId>
@@ -169,37 +172,6 @@
                         <jvmFlag>-Dclojure.core.loading-verbosely=true</jvmFlag>
                     </jvmFlags>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>com.theoryinpractise</groupId>
-                <artifactId>clojure-maven-plugin</artifactId>
-                <version>1.3.23</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <sourceDirectories>
-                        <sourceDirectory>src/main/clojure</sourceDirectory>
-                    </sourceDirectories>
-                    <testSourceDirectories>
-                        <testSourceDirectory>src/test/clojure</testSourceDirectory>
-                    </testSourceDirectories>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>compile</id>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>compile</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>test</id>
-                        <phase>test</phase>
-                        <goals>
-                            <goal>test</goal>
-                        </goals>
-                    </execution>
-
-                </executions>
             </plugin>
         </plugins>
     </build>

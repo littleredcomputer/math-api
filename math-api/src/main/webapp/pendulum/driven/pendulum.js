@@ -314,6 +314,9 @@ angular.module('Pendulum', ['ngMaterial', 'ngSanitize'])
         })
         .error(function(data, status) {
           console.log('ERR', data, status);
+        })
+        .finally(function() {
+          console.log('FINALLY');
         });
     };
     angular.forEach(['l1', 'm1', 'theta0', 'phi0'], function(param) {
