@@ -27,7 +27,13 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" scope="PROVIDED" name="AppEngine Dev 1.9.20" level="application_server_libraries" />
     <orderEntry type="library" name="com.google.guava:guava:18.0" level="project" />
-    <orderEntry type="library" name="org.clojure:clojure:1.6.0" level="project" />
     <orderEntry type="library" name="com.google.appengine:appengine-api-1.0-sdk:1.9.20" level="project" />
+    <orderEntry type="library" name="angular" level="application" />
+    <orderEntry type="library" name="angular-animate" level="application" />
+    <orderEntry type="library" name="angular-aria" level="application" />
+    <orderEntry type="library" name="angular-material" level="application" />
+    <orderEntry type="library" name="angular-sanitize" level="application" />
+    <orderEntry type="library" name="d3" level="application" />
+    <orderEntry type="library" name="Leiningen: org.clojure/clojure:1.6.0" level="project" />
   </component>
 </module>

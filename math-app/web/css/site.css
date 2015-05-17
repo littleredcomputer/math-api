@@ -33,3 +33,11 @@ circle.graph-point.phi {
 circle.graph-point.theta {
   opacity: 0.5;
 }
+
+div.graph-container {
+  background: #9cf;
+}
+
+div.animation-container {
+  background: #cf9;
+}
