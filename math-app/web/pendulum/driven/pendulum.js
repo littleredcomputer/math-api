@@ -306,7 +306,7 @@ angular.module('Pendulum', ['ngMaterial', 'ngSanitize'])
       templateUrl: '/templates/pendulum/driven-animation.html'
     };
   })
-  .controller('DrivenPendulumCtrl', ['$scope', '$http', function($scope, $http) {
+  .controller('DrivenPendulumCtrl', ['$log', '$scope', '$http', function($log, $scope, $http) {
     var self = this;
     var dp = driven_pendulum();
     this.parameters = {
@@ -336,14 +336,14 @@ angular.module('Pendulum', ['ngMaterial', 'ngSanitize'])
           dp.draw(data, url_params);
         })
         .error(function(data, status) {
-          console.log('ERR', data, status);
+          $log.error(data, status);
         })
         .finally(function() {
-          console.log('FINALLY');
+          $log.debug('FINALLY');
         });
     };
   }])
-  .controller('DoublePendulumCtrl', ['$scope', '$http', function($scope, $http) {
+  .controller('DoublePendulumCtrl', ['$log', '$scope', '$http', function($log, $scope, $http) {
     var self = this;
     var dp = double_pendulum();
     this.parameters = {
@@ -356,7 +356,7 @@ angular.module('Pendulum', ['ngMaterial', 'ngSanitize'])
       g: {nameHtml: 'g', min: -2, max: 15, step: 0.1, value: 9.8},
       t: {nameHtml: 't', min: 1, max: 100, step: 2, value: 25}};
     this.init = function() {
-      console.log('LOADED');
+      $log.debug('LOADED');
       angular.forEach(['l1', 'm1', 'theta0', 'phi0'], function(param) {
         $scope.$watch(function() {
           return self.parameters[param].value;
@@ -378,10 +378,10 @@ angular.module('Pendulum', ['ngMaterial', 'ngSanitize'])
           dp.draw(data, url_params);
         })
         .error(function(data, status) {
-          console.log('ERR', data, status);
+          $log.error(data, status);
         })
         .finally(function() {
-          console.log('FINALLY');
+          $log.debug('FINALLY');
         });
     };
   }]);
