@@ -15,6 +15,10 @@
     <servlet-name>pendulum</servlet-name>
     <servlet-class>net.littleredcomputer.math.api.pendulum</servlet-class>
   </servlet>
+  <servlet>
+    <servlet-name>rigid</servlet-name>
+    <servlet-class>net.littleredcomputer.math.api.rigid</servlet-class>
+  </servlet>
   <servlet-mapping>
     <servlet-name>hello</servlet-name>
     <url-pattern>/hello</url-pattern>
@@ -26,6 +30,10 @@
   <servlet-mapping>
     <servlet-name>pendulum</servlet-name>
     <url-pattern>/api/sicm/pendulum/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>rigid</servlet-name>
+    <url-pattern>/api/sicm/rigid/*</url-pattern>
   </servlet-mapping>
   <mime-mapping>
     <extension>clj</extension>
