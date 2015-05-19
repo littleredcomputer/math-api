@@ -14,6 +14,7 @@
   (:import [com.google.appengine.api.memcache MemcacheServiceFactory MemcacheService AsyncMemcacheService])
   (:gen-class :extends javax.servlet.http.HttpServlet))
 
+(set! *warn-on-reflection* true)
 (def ^AsyncMemcacheService memcache-service (MemcacheServiceFactory/getAsyncMemcacheService))
 
 (defroutes
