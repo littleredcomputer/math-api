@@ -11,10 +11,10 @@
             [net.littleredcomputer.math.examples
              [driven-pendulum :refer [evolve-pendulum]]
              [double-pendulum :refer [evolve-double-pendulum]]])
-  (:import [com.google.appengine.api.memcache MemcacheServiceFactory MemcacheService])
+  (:import [com.google.appengine.api.memcache MemcacheServiceFactory MemcacheService AsyncMemcacheService])
   (:gen-class :extends javax.servlet.http.HttpServlet))
 
-(def ^MemcacheService memcache-service (MemcacheServiceFactory/getMemcacheService))
+(def ^AsyncMemcacheService memcache-service (MemcacheServiceFactory/getAsyncMemcacheService))
 
 (defroutes
   pendulum
@@ -25,7 +25,7 @@
        (let [args (for [param [:t :A :omega :g :theta0 :thetaDot0]]
                     (Double/valueOf (param params)))
              key (assoc params :kind :driven-pendulum)
-             cached (.get memcache-service key)]
+             cached (.get (.get memcache-service key))]
          (response
            (if cached
              (do
@@ -43,7 +43,7 @@
        (let [args (for [param [:t :g :m1 :l1 :theta0 :thetaDot0 :m2 :l2 :phi0 :phiDot0]]
                     (Double/valueOf (param params)))
              key (assoc params :kind :double-pendulum)
-             cached (.get memcache-service key)]
+             cached (.get (.get memcache-service key))]
          (response
            (if cached
              (do
