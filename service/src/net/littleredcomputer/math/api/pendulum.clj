@@ -11,9 +11,7 @@
             [net.littleredcomputer.math.examples
              [driven-pendulum :refer [evolve-pendulum]]
              [double-pendulum :refer [evolve-double-pendulum]]])
-  (:import [com.google.appengine.api.memcache MemcacheServiceFactory AsyncMemcacheService]
-           (com.google.common.util.concurrent JdkFutureAdapters Futures FutureCallback)
-           (com.google.common.base Stopwatch))
+  (:import [com.google.appengine.api.memcache MemcacheServiceFactory AsyncMemcacheService])
   (:gen-class :extends javax.servlet.http.HttpServlet))
 
 (set! *warn-on-reflection* true)
@@ -22,45 +20,41 @@
 (defroutes
   pendulum
   (GET "/api/sicm/pendulum/help" []
-    (-> "here is some help (not)" response (content-type "text/plain")))
-  (GET "/api/sicm/pendulum/driven/evolve" {params :params}
-    (log/info "params" params)
-    (let [args (for [param [:t :A :omega :g :theta0 :thetaDot0]]
-                 (Double/valueOf (param params)))
-          key (assoc params :kind :driven-pendulum)
-          cached (.get (.get memcache-service key))]
-      (response
-        (if cached
-          (do
-            (log/info "cache hit")
-            cached)
-          (do
-            (log/info "cache miss")
-            (let [data (apply evolve-pendulum args)
-                  cache-insert-time (Stopwatch/createStarted)]
-              (-> (.put memcache-service key data)
-                  JdkFutureAdapters/listenInPoolThread
-                  (Futures/addCallback (proxy [FutureCallback] []
-                                         (onSuccess [v] (log/info "cache insert complete " (str cache-insert-time))))))
-              data))))))
+       (-> "here is some help (not)" response (content-type "text/plain")))
+  (GET "/api/sicm/pendulum/driven/evolve" {uri :uri params :params}
+       (log/info "params" params "uri" uri)
+       (let [args (for [param [:t :A :omega :g :theta0 :thetaDot0]]
+                    (Double/parseDouble (param params)))
+             key (assoc params :uri uri)
+             cached (.get (.get memcache-service key))]
+         (response
+           (if cached
+             (do
+               (log/info "cache hit")
+               cached)
+             (do
+               (log/info "cache miss")
+               (let [data (apply evolve-pendulum args)]
+                 (.put memcache-service key data)
+                 data))))))
   ;; Yes, this looks repetitive, but we're just brining up these visualizations
   ;; so I'm waiting to see what should be abstracted.
-  (GET "/api/sicm/pendulum/double/evolve" {params :params}
-    (log/info "params" params)
-    (let [args (for [param [:t :g :m1 :l1 :theta0 :thetaDot0 :m2 :l2 :phi0 :phiDot0]]
-                 (Double/valueOf (param params)))
-          key (assoc params :kind :double-pendulum)
-          cached (.get (.get memcache-service key))]
-      (response
-        (if cached
-          (do
-            (log/info "cache hit")
-            cached)
-          (do
-            (log/info "cache miss")
-            (let [data (apply evolve-double-pendulum args)]
-              (.put memcache-service key data)
-              data)))))))
+  (GET "/api/sicm/pendulum/double/evolve" {uri :uri params :params}
+       (log/info "params" params "uri" uri)
+       (let [args (for [param [:t :g :m1 :l1 :theta0 :thetaDot0 :m2 :l2 :phi0 :phiDot0]]
+                    (Double/parseDouble (param params)))
+             key (assoc params :uri uri)
+             cached (.get (.get memcache-service key))]
+         (response
+           (if cached
+             (do
+               (log/info "cache hit")
+               cached)
+             (do
+               (log/info "cache miss")
+               (let [data (apply evolve-double-pendulum args)]
+                 (.put memcache-service key data)
+                 data)))))))
 
 (defservice (-> pendulum
                 wrap-json-response
