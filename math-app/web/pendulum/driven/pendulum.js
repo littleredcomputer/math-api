@@ -83,38 +83,34 @@ function driven_pendulum() {
       .attr('cy', function(d) { return y_scale(wrap_pi(d[1])) })
       .attr('class', 'graph-point')
       .attr('r', 1)
-      .transition()
-      .delay(function(d) {return d[0] * 1000.;})
-      .duration(100)
-      .style('fill', 'red')
-      .attr('r', 3)
-      .transition()
-      .duration(100)
-      .style('fill', 'black')
-      .attr('r', 1);
+  }
 
-    for (var i = 0; i < data.length; ++i) {
+  function animate(interval, data, parameters) {
+    // XXX should inject interval?
+    var i = 0;
+    var points = d3.selectAll('#pendulum-graph circle')[0];
+    interval(function() {
       var d = data[i];
-      var delay = d[0] * 1000.,
-        y1 = dy_scale(d[2]),
+      var y1 = dy_scale(d[2]),
         x2 = dx_scale(Math.sin(d[1])),
         y2 = dy_scale(-Math.cos(d[1]) + d[2]);
 
-      strut.transition()
-        .delay(delay)
-        .duration(10)
-        .attr('y1', y1)
-        .attr('x2', x2)
-        .attr('y2', y2);
-      pivot.transition().delay(delay).duration(10).attr('cy', y1);
-      bob.transition().delay(delay).duration(10).attr('cx', x2).attr('cy', y2);
-    }
+      pivot.attr('cy', y1);
+      strut.attr('y1', y1).attr('x2', x2).attr('y2', y2);
+      bob.attr('cx', x2).attr('cy', y2);
+      points[i].setAttribute('r', 3);
+      if (i > 0) {
+        points[i-1].setAttribute('r', 1);
+      }
+      i++;
+    }, 10, Math.floor(parameters.t * 100));
   }
 
   return {
     setup: setup,
     diagram: diagram,
-    draw: draw
+    draw: draw,
+    animate: animate
   };
 
 }
@@ -207,18 +203,7 @@ function double_pendulum() {
       })
       .classed('graph-point theta', true)
       .attr('r', 1)
-      .style('fill', '#400')
-      .transition()
-      .delay(function(d) {
-        return d[0] * 1000.;
-      })
-      .duration(100)
-      .style('fill', 'red')
-      .attr('r', 3)
-      .transition()
-      .duration(100)
-      .style('fill', '#400')
-      .attr('r', 1);
+      .style('fill', '#400');
 
     svg.selectAll('circle.phi')
       .data(data)
@@ -232,58 +217,45 @@ function double_pendulum() {
       })
       .classed('graph-point phi', true)
       .attr('r', 1)
-      .style('fill', '#040')
-      .transition()
-      .delay(function(d) {
-        return d[0] * 1000.;
-      })
-      .duration(100)
-      .style('fill', 'green')
-      .attr('r', 3)
-      .transition()
-      .duration(100)
-      .style('fill', '#040')
-      .attr('r', 1);
+      .style('fill', '#040');
+  }
 
-    for (var i = 0; i < data.length; ++i) {
+  function animate(interval, data, parameters) {
+    // XXX: maybe this should be in a service where interval is injected rather
+    // than being passed.
+    var i = 0;
+    var l1 = parameters['l1'];
+    var l2 = parameters['l2'];
+    var theta_points = d3.selectAll('#pendulum-graph circle.theta')[0];
+    var phi_points = d3.selectAll('#pendulum-graph circle.phi')[0];
+    interval(function() {
       var d = data[i];
-      var delay = d[0] * 1000.,
-        xa = parameters['l1'] * Math.sin(d[1]),
+      var xa = l1 * Math.sin(d[1]),
         xA = dx_scale(xa),
-        ya = -parameters['l1'] * Math.cos(d[1]),
+        ya = -l1 * Math.cos(d[1]),
         yA = dy_scale(ya),
-        xB = dx_scale(xa + parameters.l2 * Math.sin(d[2])),
-        yB = dy_scale(ya - parameters.l2 * Math.cos(d[2]));
+        xB = dx_scale(xa + l2 * Math.sin(d[2])),
+        yB = dy_scale(ya - l2 * Math.cos(d[2]));
 
-      strut1.transition()
-        .delay(delay)
-        .duration(10)
-        .attr('x2', xA)
-        .attr('y2', yA);
-      strut2.transition()
-        .delay(delay)
-        .duration(10)
-        .attr('x1', xA)
-        .attr('y1', yA)
-        .attr('x2', xB)
-        .attr('y2', yB);
-      bob1.transition()
-        .delay(delay)
-        .duration(10)
-        .attr('cx', xA)
-        .attr('cy', yA);
-      bob2.transition()
-        .delay(delay)
-        .duration(10)
-        .attr('cx', xB)
-        .attr('cy', yB);
-    }
+      strut1.attr('x2', xA).attr('y2', yA);
+      strut2.attr('x1', xA).attr('y1', yA).attr('x2', xB).attr('y2', yB);
+      bob1.attr('cx', xA).attr('cy', yA);
+      bob2.attr('cx', xB).attr('cy', yB);
+      theta_points[i].setAttribute('r', 3);
+      phi_points[i].setAttribute('r', 3);
+      if (i > 0) {
+        theta_points[i-1].setAttribute('r', 1);
+        phi_points[i-1].setAttribute('r', 1);
+      }
+      i++;
+    }, 10, Math.floor(parameters.t * 100));
   }
 
   return {
     setup: setup,
     diagram: diagram,
-    draw: draw
+    draw: draw,
+    animate: animate,
   };
 }
 
@@ -306,7 +278,7 @@ angular.module('Pendulum', ['ngMaterial', 'ngSanitize'])
       templateUrl: '/templates/pendulum/driven-animation.html'
     };
   })
-  .controller('DrivenPendulumCtrl', ['$log', '$scope', '$http', function($log, $scope, $http) {
+  .controller('DrivenPendulumCtrl', ['$log', '$interval', '$scope', '$http', function($log, $interval, $scope, $http) {
     var self = this;
     var dp = driven_pendulum();
     this.parameters = {
@@ -324,6 +296,9 @@ angular.module('Pendulum', ['ngMaterial', 'ngSanitize'])
           dp.diagram(self.parameters);
         })
       });
+      $scope.$on('$destroy', function() {
+        $log.debug('DESTROY');
+      });
       dp.setup();
     }
     this.go = function() {
@@ -334,6 +309,7 @@ angular.module('Pendulum', ['ngMaterial', 'ngSanitize'])
       $http.get('/api/sicm/pendulum/driven/evolve', {params: url_params})
         .success(function(data) {
           dp.draw(data, url_params);
+          dp.animate($interval, data, url_params);
         })
         .error(function(data, status) {
           $log.error(data, status);
@@ -343,7 +319,7 @@ angular.module('Pendulum', ['ngMaterial', 'ngSanitize'])
         });
     };
   }])
-  .controller('DoublePendulumCtrl', ['$log', '$scope', '$http', function($log, $scope, $http) {
+  .controller('DoublePendulumCtrl', ['$log', '$interval', '$scope', '$http', function($log, $interval, $scope, $http) {
     var self = this;
     var dp = double_pendulum();
     this.parameters = {
@@ -364,6 +340,9 @@ angular.module('Pendulum', ['ngMaterial', 'ngSanitize'])
           dp.diagram(self.parameters);
         });
       });
+      $scope.$on('$destroy', function() {
+        $log.debug('DESTROY');
+      });
       dp.setup();
     }
     this.go = function() {
@@ -376,6 +355,7 @@ angular.module('Pendulum', ['ngMaterial', 'ngSanitize'])
       $http.get('/api/sicm/pendulum/double/evolve', {params: url_params})
         .success(function(data) {
           dp.draw(data, url_params);
+          dp.animate($interval, data, url_params);
         })
         .error(function(data, status) {
           $log.error(data, status);
