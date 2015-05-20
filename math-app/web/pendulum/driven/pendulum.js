@@ -12,7 +12,7 @@ function wrap_pi(angle) {
 function driven_pendulum() {
   // plot the data in the graph canvas
   var margin = { left: 40, right: 20, top: 20, bottom: 25},
-    animation, strut, pivot, bob, dx_scale, dy_scale;
+    animation, strut, pivot, bob, dx_scale, dy_scale, intvl;
 
   function setup() {
     animation = document.getElementById('pendulum-animation');
@@ -85,11 +85,16 @@ function driven_pendulum() {
       .attr('r', 1)
   }
 
-  function animate(interval, data, parameters) {
+  function animate($interval, data, parameters) {
     // XXX should inject interval?
     var i = 0;
     var points = d3.selectAll('#pendulum-graph circle')[0];
-    interval(function() {
+    if (intvl) {
+      console.log('cancelling interval');
+      $interval.cancel(intvl);
+    }
+    var t0 = new Date();
+    var intvl = $interval(function() {
       var d = data[i];
       var y1 = dy_scale(d[2]),
         x2 = dx_scale(Math.sin(d[1])),
@@ -103,7 +108,15 @@ function driven_pendulum() {
         points[i-1].setAttribute('r', 1);
       }
       i++;
-    }, 10, Math.floor(parameters.t * 100));
+    }, 10, data.length, false);
+    intvl.then(function() {
+      console.log('interval complete');
+      var t1 = new Date();
+      var ms = t1 - t0;
+      console.log(data.length, 'points in', ms, 'ms');
+    }, function() {
+      console.log('interval died');
+    });
   }
 
   return {
@@ -220,7 +233,7 @@ function double_pendulum() {
       .style('fill', '#040');
   }
 
-  function animate(interval, data, parameters) {
+  function animate($interval, data, parameters) {
     // XXX: maybe this should be in a service where interval is injected rather
     // than being passed.
     var i = 0;
@@ -228,7 +241,8 @@ function double_pendulum() {
     var l2 = parameters['l2'];
     var theta_points = d3.selectAll('#pendulum-graph circle.theta')[0];
     var phi_points = d3.selectAll('#pendulum-graph circle.phi')[0];
-    interval(function() {
+    var t0 = new Date();
+    var intvl = $interval(function() {
       var d = data[i];
       var xa = l1 * Math.sin(d[1]),
         xA = dx_scale(xa),
@@ -248,7 +262,15 @@ function double_pendulum() {
         phi_points[i-1].setAttribute('r', 1);
       }
       i++;
-    }, 10, Math.floor(parameters.t * 100));
+    }, 10, data.length, false);
+    intvl.then(function() {
+      console.log('interval complete 2');
+      var ms = new Date() - t0;
+      console.log(data.length, 'points in', ms, 'msec');
+    }, function() {
+      console.log('interval died');
+    });
+    return intvl;
   }
 
   return {
@@ -302,14 +324,20 @@ angular.module('Pendulum', ['ngMaterial', 'ngSanitize'])
       dp.setup();
     }
     this.go = function() {
+      if (self.interval) {
+        $log.debug('cancelling interval');
+        $interval.cancel(self.interval);
+      }
       var url_params = {};
       angular.forEach(this.parameters, function(value, name) {
         url_params[name] = value.value;
       });
+      url_params.dt = 1/60;
       $http.get('/api/sicm/pendulum/driven/evolve', {params: url_params})
         .success(function(data) {
           dp.draw(data, url_params);
-          dp.animate($interval, data, url_params);
+          self.interval = dp.animate($interval, data, url_params);
+          $log.debug('interval', self.interval);
         })
         .error(function(data, status) {
           $log.error(data, status);
@@ -346,16 +374,23 @@ angular.module('Pendulum', ['ngMaterial', 'ngSanitize'])
       dp.setup();
     }
     this.go = function() {
+      if (self.interval) {
+        $log.debug('cancelling interval', self.interval);
+        $interval.cancel(self.interval);
+        $log.debug('interval is now', self.interval);
+      }
       var url_params = {};
       angular.forEach(this.parameters, function(value, name) {
         url_params[name] = value.value;
       });
+      url_params.dt = 1/60;
       url_params.l2 = 1 - url_params['l1'];
       url_params.m2 = 1 - url_params['m1'];
       $http.get('/api/sicm/pendulum/double/evolve', {params: url_params})
         .success(function(data) {
           dp.draw(data, url_params);
-          dp.animate($interval, data, url_params);
+          self.interval = dp.animate($interval, data, url_params);
+          $log.debug('interval', self.interval)
         })
         .error(function(data, status) {
           $log.error(data, status);
