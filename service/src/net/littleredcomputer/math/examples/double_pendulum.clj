@@ -36,7 +36,7 @@
      (L-double-pend m1 m2 l1 l2 g)))
 
 (defn evolver
-   [t g m1 l1 θ0 θdot0 m2 l2 φ0 φdot0]
+   [t dt g m1 l1 θ0 θdot0 m2 l2 φ0 φdot0]
    (let [state-history (atom [])]
      ((evolve pend-state-derivative
               m1 ;; mass of bob1
@@ -49,7 +49,7 @@
            (up θ0 φ0)
            (up θdot0 φdot0))
        (fn [t [_ [θ φ] _]] (swap! state-history conj [t θ φ]))
-       0.01
+       dt
        t
        1.0e-6
        {:compile true})

@@ -108,7 +108,7 @@ function driven_pendulum() {
         points[i-1].setAttribute('r', 1);
       }
       i++;
-    }, 10, data.length, false);
+    }, 1000*parameters.dt, data.length, false);
     intvl.then(function() {
       console.log('interval complete');
       var t1 = new Date();
@@ -262,7 +262,7 @@ function double_pendulum() {
         phi_points[i-1].setAttribute('r', 1);
       }
       i++;
-    }, 10, data.length, false);
+    }, 1000*parameters.dt, data.length, false);
     intvl.then(function() {
       console.log('interval complete 2');
       var ms = new Date() - t0;

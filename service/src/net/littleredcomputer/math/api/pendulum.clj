@@ -20,13 +20,13 @@
   (GET "/api/sicm/pendulum/help" []
     (-> "here is some help (not)" response (content-type "text/plain")))
   (GET "/api/sicm/pendulum/driven/evolve" {uri :uri params :params}
-    (let [args (for [param [:t :A :omega :g :theta0 :thetaDot0]]
+    (let [args (for [param [:t :dt :A :omega :g :theta0 :thetaDot0]]
                  (Double/parseDouble (param params)))]
       (response (cached (assoc params :uri uri) (apply driven/evolver args)))))
   (GET "/api/sicm/pendulum/driven/equations" []
     (-> driven/equations (pp/write :stream nil) response (content-type "text/plain; charset=UTF-8")))
   (GET "/api/sicm/pendulum/double/evolve" {uri :uri params :params}
-    (let [args (for [param [:t :g :m1 :l1 :theta0 :thetaDot0 :m2 :l2 :phi0 :phiDot0]]
+    (let [args (for [param [:t :dt :g :m1 :l1 :theta0 :thetaDot0 :m2 :l2 :phi0 :phiDot0]]
                  (Double/parseDouble (param params)))]
       (response (cached (assoc params :uri uri) (apply double/evolver args)))))
   (GET "/api/sicm/pendulum/double/equations" []

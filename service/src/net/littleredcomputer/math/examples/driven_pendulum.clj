@@ -33,7 +33,7 @@
               (up 't 'θ_0 'θdot_0))))
 
 (defn evolver
-  [t A ω g θ0 θdot0]
+  [t dt A ω g θ0 θdot0]
   (let [drive (periodic-drive A ω 0)
         state-history (atom [])]
     ((evolve pend-state-derivative
@@ -46,7 +46,7 @@
          θ0
          θdot0)
      (fn [t [_ q _]] (swap! state-history conj [t q (drive t)]))
-     0.01
+     dt
      t
      1.0e-6
      {:compile true})
