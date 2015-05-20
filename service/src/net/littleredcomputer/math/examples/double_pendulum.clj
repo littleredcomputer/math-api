@@ -35,7 +35,7 @@
    (Lagrangian->state-derivative
      (L-double-pend m1 m2 l1 l2 g)))
 
-(defn evolve-double-pendulum
+(defn evolver
    [t g m1 l1 θ0 θdot0 m2 l2 φ0 φdot0]
    (let [state-history (atom [])]
      ((evolve pend-state-derivative
@@ -55,4 +55,9 @@
        {:compile true})
      @state-history))
 
+(def equations
+  (simplify ((pend-state-derivative 'm_1 'm_2 'l_1 'l_2 'g)
+              (up 't
+                (up 'θ_0 'φ_0)
+                (up 'θdot_0 'φdot_0)))))
 

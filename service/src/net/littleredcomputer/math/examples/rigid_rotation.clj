@@ -4,7 +4,7 @@
             [math.mechanics.rigid :refer [rigid-sysder]]))
 
 
-(defn evolve-rigid-body
+(defn evolver
   [t A B C]
   (let [state-history (atom [])]
     ((evolve rigid-sysder
@@ -19,3 +19,9 @@
       1.0e-6
       {:compile true})
     @state-history))
+
+(def equations
+  (simplify ((rigid-sysder 'A 'B 'C)
+              (up 't
+                (up 'α 'β 'γ)
+                (up 'αdot 'βdot 'γdot)))))

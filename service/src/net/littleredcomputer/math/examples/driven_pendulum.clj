@@ -23,11 +23,16 @@
   [A ω φ]
   #(-> % (* ω) (+ φ) cos (* A)))
 
-(defn pend-state-derivative  [m l g drive]
+(defn pend-state-derivative
+  [m l g drive]
   (Lagrangian->state-derivative
    (L-pend m l g drive)))
 
-(defn evolve-pendulum
+(def equations
+  (simplify ((pend-state-derivative 'm 'l 'g (periodic-drive 'A 'ω 'φ))
+              (up 't 'θ_0 'θdot_0))))
+
+(defn evolver
   [t A ω g θ0 θdot0]
   (let [drive (periodic-drive A ω 0)
         state-history (atom [])]

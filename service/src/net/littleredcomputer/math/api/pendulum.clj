@@ -1,5 +1,5 @@
 (ns net.littleredcomputer.math.api.pendulum
-  (:require [clojure.tools.logging :as log]
+  (:require [clojure.pprint :as pp]
             [ring.util
              [response :refer [response content-type]]
              [servlet :refer [defservice]]]
@@ -7,58 +7,33 @@
              [defaults :refer [wrap-defaults api-defaults]]
              [json :refer [wrap-json-response]]]
             [compojure.core :refer [defroutes GET POST]]
-            [hiccup.core :refer :all]
+            [net.littleredcomputer.math.api.middleware :refer [log-params cached]]
             [net.littleredcomputer.math.examples
-             [driven-pendulum :refer [evolve-pendulum]]
-             [double-pendulum :refer [evolve-double-pendulum]]])
-  (:import [com.google.appengine.api.memcache MemcacheServiceFactory AsyncMemcacheService])
+             [driven-pendulum :as driven]
+             [double-pendulum :as double]])
   (:gen-class :extends javax.servlet.http.HttpServlet))
 
 (set! *warn-on-reflection* true)
-(def ^AsyncMemcacheService memcache-service (MemcacheServiceFactory/getAsyncMemcacheService))
 
 (defroutes
   pendulum
   (GET "/api/sicm/pendulum/help" []
-       (-> "here is some help (not)" response (content-type "text/plain")))
+    (-> "here is some help (not)" response (content-type "text/plain")))
   (GET "/api/sicm/pendulum/driven/evolve" {uri :uri params :params}
-       (log/info "params" params "uri" uri)
-       (let [args (for [param [:t :A :omega :g :theta0 :thetaDot0]]
-                    (Double/parseDouble (param params)))
-             key (assoc params :uri uri)
-             cached (.get (.get memcache-service key))]
-         (response
-           (if cached
-             (do
-               (log/info "cache hit")
-               cached)
-             (do
-               (log/info "cache miss")
-               (let [data (apply evolve-pendulum args)]
-                 (.put memcache-service key data)
-                 data))))))
-  ;; Yes, this looks repetitive, but we're just brining up these visualizations
-  ;; so I'm waiting to see what should be abstracted.
+    (let [args (for [param [:t :A :omega :g :theta0 :thetaDot0]]
+                 (Double/parseDouble (param params)))]
+      (response (cached (assoc params :uri uri) (apply driven/evolver args)))))
+  (GET "/api/sicm/pendulum/driven/equations" []
+    (-> driven/equations (pp/write :stream nil) response (content-type "text/plain; charset=UTF-8")))
   (GET "/api/sicm/pendulum/double/evolve" {uri :uri params :params}
-       (log/info "params" params "uri" uri)
-       (let [args (for [param [:t :g :m1 :l1 :theta0 :thetaDot0 :m2 :l2 :phi0 :phiDot0]]
-                    (Double/parseDouble (param params)))
-             key (assoc params :uri uri)
-             cached (.get (.get memcache-service key))]
-         (response
-           (if cached
-             (do
-               (log/info "cache hit")
-               cached)
-             (do
-               (log/info "cache miss")
-               (let [data (apply evolve-double-pendulum args)]
-                 (.put memcache-service key data)
-                 data)))))))
+    (let [args (for [param [:t :g :m1 :l1 :theta0 :thetaDot0 :m2 :l2 :phi0 :phiDot0]]
+                 (Double/parseDouble (param params)))]
+      (response (cached (assoc params :uri uri) (apply double/evolver args)))))
+  (GET "/api/sicm/pendulum/double/equations" []
+    (-> double/equations (pp/write :stream nil) response (content-type "text/plain; charset=UTF-8"))))
 
 (defservice (-> pendulum
-                wrap-json-response
-                (wrap-defaults api-defaults)))
+              log-params
+              wrap-json-response
+              (wrap-defaults api-defaults)))
 
-(defn -main [& args]
-  (println "HW"))
