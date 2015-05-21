@@ -89,12 +89,12 @@ function driven_pendulum() {
     // XXX should inject interval?
     var i = 0;
     var points = d3.selectAll('#pendulum-graph circle')[0];
-    if (intvl) {
+    if (timer) {
       console.log('cancelling interval');
-      $interval.cancel(intvl);
+      $interval.cancel(timer);
     }
     var t0 = new Date();
-    var intvl = $interval(function() {
+    var timer = $interval(function() {
       var d = data[i];
       var y1 = dy_scale(d[2]),
         x2 = dx_scale(Math.sin(d[1])),
@@ -109,7 +109,7 @@ function driven_pendulum() {
       }
       i++;
     }, 1000 * parameters.dt, data.length, false);
-    intvl.then(function() {
+    timer.then(function() {
       console.log('interval complete');
       var t1 = new Date();
       var ms = t1 - t0;
@@ -242,7 +242,7 @@ function double_pendulum() {
     var theta_points = d3.selectAll('#pendulum-graph circle.theta')[0];
     var phi_points = d3.selectAll('#pendulum-graph circle.phi')[0];
     var t0 = new Date();
-    var intvl = $interval(function() {
+    var timer = $interval(function() {
       var d = data[i];
       var xa = l1 * Math.sin(d[1]),
         xA = dx_scale(xa),
@@ -263,14 +263,14 @@ function double_pendulum() {
       }
       i++;
     }, 1000 * parameters.dt, data.length, false);
-    intvl.then(function() {
+    timer.then(function() {
       console.log('interval complete 2');
       var ms = new Date() - t0;
       console.log(data.length, 'points in', ms, 'msec');
     }, function() {
       console.log('interval died');
     });
-    return intvl;
+    return timer;
   }
 
   return {
