@@ -12,7 +12,7 @@ function wrap_pi(angle) {
 function driven_pendulum() {
   // plot the data in the graph canvas
   var margin = { left: 40, right: 20, top: 20, bottom: 25},
-    animation, strut, pivot, bob, dx_scale, dy_scale, intvl;
+    animation, strut, pivot, bob, dx_scale, dy_scale;
 
   function setup() {
     animation = document.getElementById('pendulum-animation');
@@ -108,7 +108,7 @@ function driven_pendulum() {
         points[i-1].setAttribute('r', 1);
       }
       i++;
-    }, 1000*parameters.dt, data.length, false);
+    }, 1000 * parameters.dt, data.length, false);
     intvl.then(function() {
       console.log('interval complete');
       var t1 = new Date();
@@ -262,7 +262,7 @@ function double_pendulum() {
         phi_points[i-1].setAttribute('r', 1);
       }
       i++;
-    }, 1000*parameters.dt, data.length, false);
+    }, 1000 * parameters.dt, data.length, false);
     intvl.then(function() {
       console.log('interval complete 2');
       var ms = new Date() - t0;
@@ -277,7 +277,7 @@ function double_pendulum() {
     setup: setup,
     diagram: diagram,
     draw: draw,
-    animate: animate,
+    animate: animate
   };
 }
 
@@ -322,7 +322,7 @@ angular.module('Pendulum', ['ngMaterial', 'ngSanitize'])
         $log.debug('DESTROY');
       });
       dp.setup();
-    }
+    };
     this.go = function() {
       if (self.interval) {
         $log.debug('cancelling interval');
@@ -335,6 +335,7 @@ angular.module('Pendulum', ['ngMaterial', 'ngSanitize'])
       url_params.dt = 1/60;
       $http.get('/api/sicm/pendulum/driven/evolve', {params: url_params})
         .success(function(data) {
+          dp.setup();
           dp.draw(data, url_params);
           self.interval = dp.animate($interval, data, url_params);
           $log.debug('interval', self.interval);
@@ -372,7 +373,7 @@ angular.module('Pendulum', ['ngMaterial', 'ngSanitize'])
         $log.debug('DESTROY');
       });
       dp.setup();
-    }
+    };
     this.go = function() {
       if (self.interval) {
         $log.debug('cancelling interval', self.interval);
@@ -388,6 +389,7 @@ angular.module('Pendulum', ['ngMaterial', 'ngSanitize'])
       url_params.m2 = 1 - url_params['m1'];
       $http.get('/api/sicm/pendulum/double/evolve', {params: url_params})
         .success(function(data) {
+          dp.setup();
           dp.draw(data, url_params);
           self.interval = dp.animate($interval, data, url_params);
           $log.debug('interval', self.interval)

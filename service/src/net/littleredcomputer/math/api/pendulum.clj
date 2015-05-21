@@ -33,7 +33,7 @@
     (-> double/equations (pp/write :stream nil) response (content-type "text/plain; charset=UTF-8"))))
 
 (defservice (-> pendulum
-              log-params
-              wrap-json-response
-              (wrap-defaults api-defaults)))
+                log-params
+                wrap-json-response
+                (wrap-defaults api-defaults)))
 

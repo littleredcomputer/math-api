@@ -8,11 +8,11 @@
   [t A B C]
   (let [state-history (atom [])]
     ((evolve rigid-sysder
-       A B C                                                ;; moments of inertia
-       )
+             A B C                                                ;; moments of inertia
+             )
       (up 0.0
-        (up 1 0 0)
-        (up 0.1 0.1 0.1))
+          (up 1 0 0)
+          (up 0.1 0.1 0.1))
       (fn [t [_ [α β γ] _]] (swap! state-history conj [t α β γ]))
       0.01
       t
@@ -23,5 +23,5 @@
 (def equations
   (simplify ((rigid-sysder 'A 'B 'C)
               (up 't
-                (up 'α 'β 'γ)
-                (up 'αdot 'βdot 'γdot)))))
+                  (up 'α 'β 'γ)
+                  (up 'αdot 'βdot 'γdot)))))

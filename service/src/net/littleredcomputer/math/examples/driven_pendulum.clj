@@ -26,7 +26,7 @@
 (defn pend-state-derivative
   [m l g drive]
   (Lagrangian->state-derivative
-   (L-pend m l g drive)))
+    (L-pend m l g drive)))
 
 (def equations
   (simplify ((pend-state-derivative 'm 'l 'g (periodic-drive 'A 'ω 'φ))
@@ -42,12 +42,12 @@
              g ;; acceleration due to gravity
              drive ;; motion of pendulum support
              )
-     (up 0.0
-         θ0
-         θdot0)
-     (fn [t [_ q _]] (swap! state-history conj [t q (drive t)]))
-     dt
-     t
-     1.0e-6
-     {:compile true})
+      (up 0.0
+          θ0
+          θdot0)
+      (fn [t [_ q _]] (swap! state-history conj [t q (drive t)]))
+      dt
+      t
+      1.0e-6
+      {:compile true})
     @state-history))

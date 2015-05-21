@@ -24,6 +24,6 @@
     (-> rigid/equations (pp/write :stream nil) response (content-type "text/plain; charset=utf-8"))))
 
 (defservice (-> rigid
-              log-params
-              wrap-json-response
-              (wrap-defaults api-defaults)))
+                log-params
+                wrap-json-response
+                (wrap-defaults api-defaults)))
