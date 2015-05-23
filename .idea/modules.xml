@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/math-app/math-app.iml" filepath="$PROJECT_DIR$/math-app/math-app.iml" />
       <module fileurl="file://$PROJECT_DIR$/math-fe/math-fe.iml" filepath="$PROJECT_DIR$/math-fe/math-fe.iml" />
       <module fileurl="file://$PROJECT_DIR$/service/service.iml" filepath="$PROJECT_DIR$/service/service.iml" />
     </modules>
