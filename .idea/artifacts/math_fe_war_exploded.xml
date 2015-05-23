@@ -50,12 +50,14 @@
           <element id="library" level="project" name="Leiningen: com.fasterxml.jackson.core/jackson-core:2.3.1" />
           <element id="library" level="project" name="Leiningen: com.fasterxml.jackson.dataformat/jackson-dataformat-smile:2.3.1" />
           <element id="library" level="project" name="Leiningen: tigris:0.1.1" />
+          <element id="library" level="project" name="Leiningen: net.littleredcomputer/math:0.0.1-20150520.035634-29" />
         </element>
       </element>
       <element id="directory" name="sources">
         <element id="file-copy" path="$PROJECT_DIR$/service/src/net/littleredcomputer/math/examples/double_pendulum.clj" />
         <element id="file-copy" path="$PROJECT_DIR$/service/src/net/littleredcomputer/math/examples/driven_pendulum.clj" />
       </element>
+      <element id="javaee-facet-resources" facet="math-fe/web/Web" />
     </root>
   </artifact>
 </component>
