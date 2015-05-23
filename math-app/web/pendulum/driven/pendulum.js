@@ -132,7 +132,7 @@ function double_pendulum() {
   var pi = Math.PI,
     margin = { left: 40, right: 20, top: 20, bottom: 25},
     animation, strut1, strut2, pivot, bob1, bob2,
-    dx_scale, dy_scale;
+    dx_scale, dy_scale, m_scale;
 
   function setup() {
     animation = document.getElementById('pendulum-animation');
@@ -141,6 +141,7 @@ function double_pendulum() {
     pivot = d3.select('#pendulum-frame #pivot');
     bob1 = d3.select('#pendulum-frame #bob1');
     bob2 = d3.select('#pendulum-frame #bob2');
+    m_scale = d3.scale.linear().domain([0,1]).range([4,12]);
 
     var cWidth = animation.clientWidth,
       cHeight = animation.clientHeight,
@@ -161,7 +162,9 @@ function double_pendulum() {
 
   function diagram(parameters) {
     var l1 = parameters.l1.value,
-      l2 = 1.0 - l1,
+      l2 = 1 - l1,
+      m1 = parameters.m1.value,
+      m2 = 1 - m1,
       xa = l1 * Math.sin(parameters.theta0.value),
       xA = dx_scale(xa),
       ya = - l1 * Math.cos(parameters.theta0.value),
@@ -171,8 +174,8 @@ function double_pendulum() {
 
     strut1.attr('x2', xA).attr('y2', yA);
     strut2.attr('x1', xA).attr('y1', yA).attr('x2', xB).attr('y2', yB);
-    bob1.attr('cx', xA).attr('cy', yA);
-    bob2.attr('cx', xB).attr('cy', yB);
+    bob1.attr('cx', xA).attr('cy', yA).attr('r', m_scale(m1));
+    bob2.attr('cx', xB).attr('cy', yB).attr('r', m_scale(m2));
   }
 
   function draw(data, parameters) {
@@ -239,6 +242,8 @@ function double_pendulum() {
     var i = 0;
     var l1 = parameters['l1'];
     var l2 = parameters['l2'];
+    var m1 = parameters['m1'];
+    var m2 = parameters['m2'];
     var theta_points = d3.selectAll('#pendulum-graph circle.theta')[0];
     var phi_points = d3.selectAll('#pendulum-graph circle.phi')[0];
     var t0 = new Date();
@@ -253,8 +258,8 @@ function double_pendulum() {
 
       strut1.attr('x2', xA).attr('y2', yA);
       strut2.attr('x1', xA).attr('y1', yA).attr('x2', xB).attr('y2', yB);
-      bob1.attr('cx', xA).attr('cy', yA);
-      bob2.attr('cx', xB).attr('cy', yB);
+      bob1.attr('cx', xA).attr('cy', yA).attr('r', m_scale(m1));
+      bob2.attr('cx', xB).attr('cy', yB).attr('r', m_scale(m2));
       theta_points[i].setAttribute('r', 3);
       phi_points[i].setAttribute('r', 3);
       if (i > 0) {

@@ -1,39 +1,22 @@
-<html lang="en" ng-app="Pendulum">
+<html lang="en" xxxng-app="Pendulum">
 <head>
   <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/0.8.3/angular-material.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic">
   <link rel="stylesheet" href="/css/site.css">
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.js"></script>
   <meta name="viewport" content="initial-scale=1" />
   <meta charset="utf-8">
 </head>
-<body layout="column" ng-controller="DoublePendulumCtrl as pend">
+<body layout="column" xxxng-controller="DrivenPendulumCtrl as pend">
 <md-toolbar layout="row">
-  <h1 class="md-toolbar-tools" layout-align-gt-sm="center">The Double Pendulum</h1>
+  <h1 class="md-toolbar-tools" layout-align-gt-sm="center">3d</h1>
 </md-toolbar>
-<div layout="row" flex>
-  <div layout="column" flex id="content">
-    <md-content layout="column" flex>
-      <div layout="row" flex>
-        <div layout="column" flex=66>
-          <double-pendulum-animation layout flex></double-pendulum-animation>
-          <div layout flex id="pendulum-graph" class="graph-container"></div>
-        </div>
-        <div layout="column" flex=33>
-          <value-sliders ></value-sliders>
-          <div layout="row" layout-align="space-around center">
-            <md-button ng-click="pend.go();" class="md-fab">Go</md-button>
-          </div>
-        </div>
-      </div>
-    </md-content>
-  </div>
-</div>
 <!-- Angular Material Dependencies -->
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular-sanitize.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular-animate.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular-aria.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/angular_material/0.8.3/angular-material.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
-<script src="../driven/pendulum.js"></script>
+<script src="rigid.js"></script>
 </body>
 </html>
