@@ -1,11 +1,12 @@
 <component name="ArtifactManager">
-  <artifact type="exploded-war" name="math-app:war exploded">
-    <output-path>$PROJECT_DIR$/out/artifacts/math_app_war_exploded</output-path>
+  <artifact type="exploded-war" name="math-fe:war exploded">
+    <output-path>$PROJECT_DIR$/out/artifacts/math_fe_war_exploded</output-path>
     <root id="root">
       <element id="javaee-facet-resources" facet="math-app/web/Web" />
       <element id="directory" name="WEB-INF">
         <element id="directory" name="classes">
           <element id="module-output" name="math-fe" />
+          <element id="module-output" name="service" />
         </element>
         <element id="directory" name="lib">
           <element id="library" level="project" name="com.google.appengine:appengine-api-1.0-sdk:1.9.20" />
