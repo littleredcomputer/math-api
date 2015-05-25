@@ -107,11 +107,8 @@ function driven_pendulum() {
     }, 1000 * parameters.dt, data.length, false);
     timer.then(function() {
       console.log('interval complete');
-      var t1 = new Date();
-      var ms = t1 - t0;
-      console.log(data.length, 'points in', ms, 'ms');
-    }, function() {
-      console.log('interval died');
+      var ms = new Date() - t0;
+      console.log(data.length, 'points in', ms, 'msec', 1000 * data.length/ms, 'Hz');
     });
     return timer;
   }
@@ -264,11 +261,9 @@ function double_pendulum() {
       i++;
     }, 1000 * parameters.dt, data.length, false);
     timer.then(function() {
-      console.log('interval complete 2');
+      console.log('interval complete');
       var ms = new Date() - t0;
-      console.log(data.length, 'points in', ms, 'msec');
-    }, function() {
-      console.log('interval died');
+      console.log(data.length, 'points in', ms, 'msec', 1000 * data.length/ms, 'Hz');
     });
     return timer;
   }
@@ -281,7 +276,7 @@ function double_pendulum() {
   };
 }
 
-angular.module('Pendulum', ['ngMaterial', 'ngSanitize'])
+angular.module('Pendulum', ['ngMaterial', 'ngSanitize', 'cmServices'])
   .directive('valueSliders', function() {
     return {
       restrict: 'E',
@@ -300,59 +295,6 @@ angular.module('Pendulum', ['ngMaterial', 'ngSanitize'])
       templateUrl: '/templates/pendulum/driven-animation.html'
     };
   })
-  .factory('parameterManager', ['$log', '$interval', '$http', function($log, $interval, $http) {
-    var ParameterManager = function(parameters, endpoint) {
-      this.parameters = parameters;
-      this.endpoint = endpoint;
-      this.interval = undefined;
-      angular.forEach(this.parameters, function(value) {
-        value.value = value.default;
-      });
-    };
-
-    ParameterManager.prototype.watch = function($scope, action) {
-      var self = this;
-      angular.forEach(this.parameters, function(value) {
-        $scope.$watch(function() {
-          return value.value;
-        }, function() {
-          action(self.parameters);
-        })
-      });
-      $scope.$on('$destroy', function() {
-        $log.debug('DESTROY');
-      });
-    };
-
-    ParameterManager.prototype.set = function(ps) {
-      angular.forEach(this.parameters, function(value, key) {
-        if (ps[key] !== undefined) {
-          value.value = ps[p];
-        } else {
-          value.value = value.default;
-        }
-      });
-    };
-
-    ParameterManager.prototype.fetch = function(extra_params, action) {
-      var self = this;
-      if (this.interval) {
-        $log.debug('cancelling interval');
-        $interval.cancel(this.interval);
-      }
-      var url_params = {};
-      angular.forEach(this.parameters, function(value, name) {
-        url_params[name] = value.value;
-      });
-      angular.extend(url_params, extra_params);
-      $http.get(this.endpoint, {params: url_params})
-        .success(function(data) { self.interval = action(data, url_params); })
-        .error(function(data, status) {
-          $log.error(data, status);
-        });
-    };
-    return ParameterManager;
-  }])
   .controller('DrivenPendulumCtrl', ['$log', '$interval', '$scope', 'parameterManager', function($log, $interval, $scope, parameterManager) {
     var dp = driven_pendulum();
     this.parameters = {

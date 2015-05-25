@@ -1,0 +1,29 @@
+<?xml version="1.0"
+encoding="UTF-8"?>
+
+<application
+  xmlns="http://java.sun.com/xml/ns/javaee"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
+                      http://java.sun.com/xml/ns/javaee/application_5.xsd"
+  version="5">
+
+  <description>Classical Mechanics (SICM) app</description>
+  <display-name>CM</display-name>
+
+  <!-- Modules -->
+  <!-- The default module should be listed first -->
+  <module>
+    <web>
+      <web-uri>math-fe</web-uri>
+      <context-root>math-fe</context-root>
+    </web>
+  </module>
+  <module>
+    <web>
+      <web-uri>math-api</web-uri>
+      <context-root>math-api</context-root>
+    </web>
+  </module>
+
+</application>

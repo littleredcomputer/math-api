@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <appengine-web-app xmlns="http://appengine.google.com/ns/1.0">
-    <application>classical-mechanics</application>
-    <module>default</module>
-    <version>1</version>
-    <threadsafe>true</threadsafe>
+  <application>classical-mechanics</application>
+  <module>default</module>
+  <version>1</version>
+  <threadsafe>true</threadsafe>
+  <system-properties>
+    <property name="java.util.logging.config.file" value="WEB-INF/logging.properties"></property>
+    <property name="java.util.logging.SimpleFormatter.format" value="%1$tY:%1$tm:%1$td %1$tH:%1$tM:%1$tS|%4$s: %2$s%n%5$s%n%6$s%n"></property>
+  </system-properties>
 </appengine-web-app>
