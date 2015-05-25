@@ -45,3 +45,8 @@ div.animation-container {
 div.pendulum-documentation {
   padding: 5px;
 }
+
+/* odd that we need this... */
+md-progress-linear.divider .md-container {
+  top: 0;
+}

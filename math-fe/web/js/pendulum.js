@@ -277,6 +277,9 @@ function double_pendulum() {
 }
 
 angular.module('Pendulum', ['ngMaterial', 'ngSanitize', 'cmServices'])
+  .config(function($mdThemingProvider) {
+
+  })
   .directive('valueSliders', function() {
     return {
       restrict: 'E',
@@ -297,6 +300,7 @@ angular.module('Pendulum', ['ngMaterial', 'ngSanitize', 'cmServices'])
   })
   .controller('DrivenPendulumCtrl', ['$log', '$interval', '$scope', 'parameterManager', function($log, $interval, $scope, parameterManager) {
     var dp = driven_pendulum();
+    this.busy = 0;
     this.parameters = {
       theta0: {nameHtml: 'θ<sub>0</sub>', min: -3.1416, max: 3.1416, step: 0.1, default: 1},
       thetaDot0: {nameHtml: 'θ&#x307;<sub>0</sub>', min: -3, max: 3, step: 0.1, default: 0},
@@ -305,7 +309,7 @@ angular.module('Pendulum', ['ngMaterial', 'ngSanitize', 'cmServices'])
       A: {nameHtml: 'A', min: 0, max: 0.3, step: 0.05, default: 0.1},
       t: {nameHtml: 't', min: 1, max: 100, step: 2, default: 25}};
 
-    var pm = new parameterManager(this.parameters, '/api/sicm/pendulum/driven/evolve');
+    var pm = new parameterManager(this, '/api/sicm/pendulum/driven/evolve');
 
     this.init = function() {
       pm.watch($scope, dp.diagram);
@@ -322,6 +326,7 @@ angular.module('Pendulum', ['ngMaterial', 'ngSanitize', 'cmServices'])
   }])
   .controller('DoublePendulumCtrl', ['$log', '$interval', '$scope', 'parameterManager', function($log, $interval, $scope, parameterManager) {
     var dp = double_pendulum();
+    this.busy = 0;
     this.parameters = {
       l1: {nameHtml: 'l<sub>1</sub>', min: 0.1, max: 0.9, step: 0.1, default: 0.3 },
       m1: {nameHtml: 'm<sub>1</sub>', min: 0.1, max: 0.9, step: 0.1, default: 0.5 },
@@ -331,7 +336,7 @@ angular.module('Pendulum', ['ngMaterial', 'ngSanitize', 'cmServices'])
       phiDot0: {nameHtml: 'φ&#x307;<sub>0</sub>', min: -3, max: 3, step: 0.1, default: 0},
       g: {nameHtml: 'g', min: -2, max: 15, step: 0.1, default: 9.8},
       t: {nameHtml: 't', min: 1, max: 100, step: 2, default: 25}};
-    var pm = new parameterManager(this.parameters, '/api/sicm/pendulum/double/evolve');
+    var pm = new parameterManager(this, '/api/sicm/pendulum/double/evolve');
     this.init = function() {
       pm.watch($scope, dp.diagram);
       dp.setup();

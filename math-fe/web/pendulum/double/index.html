@@ -6,10 +6,11 @@
   <meta name="viewport" content="initial-scale=1" />
   <meta charset="utf-8">
 </head>
-<body layout="column" ng-controller="DoublePendulumCtrl as pend">
+<body layout="column" flex ng-controller="DoublePendulumCtrl as pend">
 <md-toolbar layout="row">
   <h1 class="md-toolbar-tools" layout-align-gt-sm="center">The Double Pendulum</h1>
 </md-toolbar>
+<md-progress-linear class="divider" md-mode="indeterminate" ng-show="pend.busy"></md-progress-linear>
 <div layout="row" flex>
   <div layout="column" flex id="content">
     <md-content layout="column" flex>
@@ -40,6 +41,6 @@
 <script src="https://ajax.googleapis.com/ajax/libs/angular_material/0.8.3/angular-material.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
 <script src="/js/services.js"></script>
-<script src="../driven/pendulum.js"></script>
+<script src="/js/pendulum.js"></script>
 </body>
 </html>

@@ -1,7 +1,8 @@
 angular.module('cmServices', [])
   .factory('parameterManager', ['$log', '$interval', '$http', function($log, $interval, $http) {
-    var ParameterManager = function(parameters, endpoint) {
-      this.parameters = parameters;
+    var ParameterManager = function(controller, endpoint) {
+      this.controller = controller;
+      this.parameters = controller.parameters;
       this.endpoint = endpoint;
       this.interval = undefined;
       angular.forEach(this.parameters, function(value) {
@@ -41,6 +42,8 @@ angular.module('cmServices', [])
         url_params[name] = value.value;
       });
       angular.extend(url_params, extra_params);
+      ++self.controller.busy;
+      $log.debug('busy', self.controller.busy);
       $http.get(this.endpoint, {params: url_params})
         .success(function(data) {
           self.interval = action(data, url_params);
@@ -54,6 +57,10 @@ angular.module('cmServices', [])
         })
         .error(function(data, status) {
           $log.error(data, status);
+        })
+        .finally(function() {
+          --self.controller.busy;
+          $log.debug('busy', self.controller.busy);
         });
     };
     return ParameterManager;
