@@ -89,10 +89,6 @@ function driven_pendulum() {
     // XXX should inject interval?
     var i = 0;
     var points = d3.selectAll('#pendulum-graph circle')[0];
-    if (timer) {
-      console.log('cancelling interval');
-      $interval.cancel(timer);
-    }
     var t0 = new Date();
     var timer = $interval(function() {
       var d = data[i];
@@ -117,6 +113,7 @@ function driven_pendulum() {
     }, function() {
       console.log('interval died');
     });
+    return timer;
   }
 
   return {
@@ -237,8 +234,6 @@ function double_pendulum() {
   }
 
   function animate($interval, data, parameters) {
-    // XXX: maybe this should be in a service where interval is injected rather
-    // than being passed.
     var i = 0;
     var l1 = parameters['l1'];
     var l2 = parameters['l2'];
@@ -305,106 +300,111 @@ angular.module('Pendulum', ['ngMaterial', 'ngSanitize'])
       templateUrl: '/templates/pendulum/driven-animation.html'
     };
   })
-  .controller('DrivenPendulumCtrl', ['$log', '$interval', '$scope', '$http', function($log, $interval, $scope, $http) {
-    var self = this;
+  .factory('parameterManager', ['$log', '$interval', '$http', function($log, $interval, $http) {
+    var ParameterManager = function(parameters, endpoint) {
+      this.parameters = parameters;
+      this.endpoint = endpoint;
+      this.interval = undefined;
+      angular.forEach(this.parameters, function(value) {
+        value.value = value.default;
+      });
+    };
+
+    ParameterManager.prototype.watch = function($scope, action) {
+      var self = this;
+      angular.forEach(this.parameters, function(value) {
+        $scope.$watch(function() {
+          return value.value;
+        }, function() {
+          action(self.parameters);
+        })
+      });
+      $scope.$on('$destroy', function() {
+        $log.debug('DESTROY');
+      });
+    };
+
+    ParameterManager.prototype.set = function(ps) {
+      angular.forEach(this.parameters, function(value, key) {
+        if (ps[key] !== undefined) {
+          value.value = ps[p];
+        } else {
+          value.value = value.default;
+        }
+      });
+    };
+
+    ParameterManager.prototype.fetch = function(extra_params, action) {
+      var self = this;
+      if (this.interval) {
+        $log.debug('cancelling interval');
+        $interval.cancel(this.interval);
+      }
+      var url_params = {};
+      angular.forEach(this.parameters, function(value, name) {
+        url_params[name] = value.value;
+      });
+      angular.extend(url_params, extra_params);
+      $http.get(this.endpoint, {params: url_params})
+        .success(function(data) { self.interval = action(data, url_params); })
+        .error(function(data, status) {
+          $log.error(data, status);
+        });
+    };
+    return ParameterManager;
+  }])
+  .controller('DrivenPendulumCtrl', ['$log', '$interval', '$scope', 'parameterManager', function($log, $interval, $scope, parameterManager) {
     var dp = driven_pendulum();
     this.parameters = {
-      theta0: {nameHtml: 'θ<sub>0</sub>', min: -3.1416, max: 3.1416, step: 0.1, value: 1},
-      thetaDot0: {nameHtml: 'θ&#x307;<sub>0</sub>', min: -3, max: 3, step: 0.1, value: 0},
-      omega: {nameHtml: 'ω', min: 0, max: 50, step: 0.1, value: 2*Math.sqrt(9.8)},
-      g: {nameHtml: 'g', min: -2, max: 15, step: 0.1, value: 9.8},
-      A: {nameHtml: 'A', min: 0, max: 0.3, step: 0.05, value: 0.1},
-      t: {nameHtml: 't', min: 1, max: 100, step: 2, value: 25}};
+      theta0: {nameHtml: 'θ<sub>0</sub>', min: -3.1416, max: 3.1416, step: 0.1, default: 1},
+      thetaDot0: {nameHtml: 'θ&#x307;<sub>0</sub>', min: -3, max: 3, step: 0.1, default: 0},
+      omega: {nameHtml: 'ω', min: 0, max: 50, step: 0.1, default: 2*Math.sqrt(9.8)},
+      g: {nameHtml: 'g', min: -2, max: 15, step: 0.1, default: 9.8},
+      A: {nameHtml: 'A', min: 0, max: 0.3, step: 0.05, default: 0.1},
+      t: {nameHtml: 't', min: 1, max: 100, step: 2, default: 25}};
+
+    var pm = new parameterManager(this.parameters, '/api/sicm/pendulum/driven/evolve');
+
     this.init = function() {
-      angular.forEach(['theta0'], function(param) {
-        $scope.$watch(function() {
-          return self.parameters[param].value;
-        }, function() {
-          dp.diagram(self.parameters);
-        })
-      });
-      $scope.$on('$destroy', function() {
-        $log.debug('DESTROY');
-      });
+      pm.watch($scope, dp.diagram);
       dp.setup();
     };
+    this.set = pm.set;
     this.go = function() {
-      if (self.interval) {
-        $log.debug('cancelling interval');
-        $interval.cancel(self.interval);
-      }
-      var url_params = {};
-      angular.forEach(this.parameters, function(value, name) {
-        url_params[name] = value.value;
+      pm.fetch({dt: 1/60}, function(data, url_params) {
+        dp.setup();
+        dp.draw(data, url_params);
+        return dp.animate($interval, data, url_params);
       });
-      url_params.dt = 1/60;
-      $http.get('/api/sicm/pendulum/driven/evolve', {params: url_params})
-        .success(function(data) {
-          dp.setup();
-          dp.draw(data, url_params);
-          self.interval = dp.animate($interval, data, url_params);
-          $log.debug('interval', self.interval);
-        })
-        .error(function(data, status) {
-          $log.error(data, status);
-        })
-        .finally(function() {
-          $log.debug('FINALLY');
-        });
     };
   }])
-  .controller('DoublePendulumCtrl', ['$log', '$interval', '$scope', '$http', function($log, $interval, $scope, $http) {
-    var self = this;
+  .controller('DoublePendulumCtrl', ['$log', '$interval', '$scope', 'parameterManager', function($log, $interval, $scope, parameterManager) {
     var dp = double_pendulum();
     this.parameters = {
-      l1: {nameHtml: 'l<sub>1</sub>', min: 0.1, max: 0.9, step: 0.1, value: 0.3 },
-      m1: {nameHtml: 'm<sub>1</sub>', min: 0.1, max: 0.9, step: 0.1, value: 0.5 },
-      theta0: {nameHtml: 'θ<sub>0</sub>', min: -3.1416, max: 3.1416, step: 0.1, value: 1},
-      thetaDot0: {nameHtml: 'θ&#x307;<sub>0</sub>', min: -3, max: 3, step: 0.1, value: 0},
-      phi0: {nameHtml: 'φ<sub>0</sub>', min: -3.1416, max: 3.1416, step: 0.1, value: -1},
-      phiDot0: {nameHtml: 'φ&#x307;<sub>0</sub>', min: -3, max: 3, step: 0.1, value: 0},
-      g: {nameHtml: 'g', min: -2, max: 15, step: 0.1, value: 9.8},
-      t: {nameHtml: 't', min: 1, max: 100, step: 2, value: 25}};
+      l1: {nameHtml: 'l<sub>1</sub>', min: 0.1, max: 0.9, step: 0.1, default: 0.3 },
+      m1: {nameHtml: 'm<sub>1</sub>', min: 0.1, max: 0.9, step: 0.1, default: 0.5 },
+      theta0: {nameHtml: 'θ<sub>0</sub>', min: -3.1416, max: 3.1416, step: 0.1, default: 1},
+      thetaDot0: {nameHtml: 'θ&#x307;<sub>0</sub>', min: -3, max: 3, step: 0.1, default: 0},
+      phi0: {nameHtml: 'φ<sub>0</sub>', min: -3.1416, max: 3.1416, step: 0.1, default: -1},
+      phiDot0: {nameHtml: 'φ&#x307;<sub>0</sub>', min: -3, max: 3, step: 0.1, default: 0},
+      g: {nameHtml: 'g', min: -2, max: 15, step: 0.1, default: 9.8},
+      t: {nameHtml: 't', min: 1, max: 100, step: 2, default: 25}};
+    var pm = new parameterManager(this.parameters, '/api/sicm/pendulum/double/evolve');
     this.init = function() {
-      $log.debug('LOADED');
-      angular.forEach(['l1', 'm1', 'theta0', 'phi0'], function(param) {
-        $scope.$watch(function() {
-          return self.parameters[param].value;
-        }, function() {
-          dp.diagram(self.parameters);
-        });
-      });
-      $scope.$on('$destroy', function() {
-        $log.debug('DESTROY');
-      });
+      pm.watch($scope, dp.diagram);
       dp.setup();
     };
+    this.set = pm.set;
     this.go = function() {
-      if (self.interval) {
-        $log.debug('cancelling interval', self.interval);
-        $interval.cancel(self.interval);
-        $log.debug('interval is now', self.interval);
-      }
-      var url_params = {};
-      angular.forEach(this.parameters, function(value, name) {
-        url_params[name] = value.value;
+      pm.fetch({
+        dt: 1 / 60,
+        l2: 1 - this.parameters.l1.value,
+        m2: 1 - this.parameters.m1.value
+      }, function(data, url_params) {
+        dp.setup();
+        dp.draw(data, url_params);
+        return dp.animate($interval, data, url_params);
       });
-      url_params.dt = 1/60;
-      url_params.l2 = 1 - url_params['l1'];
-      url_params.m2 = 1 - url_params['m1'];
-      $http.get('/api/sicm/pendulum/double/evolve', {params: url_params})
-        .success(function(data) {
-          dp.setup();
-          dp.draw(data, url_params);
-          self.interval = dp.animate($interval, data, url_params);
-          $log.debug('interval', self.interval)
-        })
-        .error(function(data, status) {
-          $log.error(data, status);
-        })
-        .finally(function() {
-          $log.debug('FINALLY');
-        });
     };
   }]);
 

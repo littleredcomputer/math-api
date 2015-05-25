@@ -41,3 +41,7 @@ div.graph-container {
 div.animation-container {
   background: #b2b6be;
 }
+
+div.pendulum-documentation {
+  padding: 5px;
+}

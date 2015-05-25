@@ -1,0 +1,17 @@
+<component name="ArtifactManager">
+  <artifact type="exploded-ear" name="math-app:ear exploded">
+    <output-path>$PROJECT_DIR$/out/artifacts/math_app_ear_exploded</output-path>
+    <root id="root">
+      <element id="directory" name="math-fe">
+        <element id="artifact" artifact-name="math-fe:war exploded" />
+      </element>
+      <element id="directory" name="math-api">
+        <element id="artifact" artifact-name="math-api:war exploded" />
+      </element>
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/app/META-INF/appengine-application.xml" />
+        <element id="file-copy" path="$PROJECT_DIR$/app/META-INF/application.xml" />
+      </element>
+    </root>
+  </artifact>
+</component>

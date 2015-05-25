@@ -9,7 +9,6 @@
         <webroots>
           <root url="file://$MODULE_DIR$/web" relative="/" />
         </webroots>
-        <sourceRoots />
       </configuration>
     </facet>
     <facet type="google-app-engine" name="Google App Engine">
@@ -21,19 +20,15 @@
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
     <content url="file://$MODULE_DIR$">
-      <sourceFolder url="file://$MODULE_DIR$/src/main/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
     </content>
-    <orderEntry type="jdk" jdkName="1.8" jdkType="JavaSDK" />
+    <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" scope="PROVIDED" name="AppEngine Dev 1.9.20" level="application_server_libraries" />
-    <orderEntry type="library" name="com.google.guava:guava:18.0" level="project" />
-    <orderEntry type="library" name="com.google.appengine:appengine-api-1.0-sdk:1.9.20" level="project" />
-    <orderEntry type="library" name="angular" level="application" />
-    <orderEntry type="library" name="angular-animate" level="application" />
-    <orderEntry type="library" name="angular-aria" level="application" />
-    <orderEntry type="library" name="angular-material" level="application" />
-    <orderEntry type="library" name="angular-sanitize" level="application" />
-    <orderEntry type="library" name="d3" level="application" />
+    <orderEntry type="library" name="AppEngine API" level="project" />
     <orderEntry type="library" name="org.clojure:clojure:1.6.0" level="project" />
+    <orderEntry type="module" module-name="service" />
+    <orderEntry type="library" name="Leiningen: com.google.appengine/appengine-api-1.0-sdk:1.9.20" level="project" />
+    <orderEntry type="library" name="Leiningen: commons-codec:1.6" level="project" />
   </component>
 </module>

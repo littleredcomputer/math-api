@@ -1,9 +1,10 @@
 (ns net.littleredcomputer.math.api.middleware
   (:require [clojure.tools.logging :as log])
-  (:import [com.google.appengine.api.memcache MemcacheServiceFactory AsyncMemcacheService]))
+  (:import [com.google.appengine.api.memcache MemcacheServiceFactory AsyncMemcacheService MemcacheService]))
 
 (set! *warn-on-reflection* true)
-(def ^AsyncMemcacheService memcache-service (MemcacheServiceFactory/getAsyncMemcacheService))
+(defonce ^AsyncMemcacheService async-memcache-service (MemcacheServiceFactory/getAsyncMemcacheService))
+(defonce ^MemcacheService memcache-service (MemcacheServiceFactory/getMemcacheService))
 
 (defn log-params
   [handler]
@@ -17,7 +18,7 @@
   asynchronous association of key -> value to be made in the background."
   [key-form value-form]
   `(let [key# ~key-form
-         cached-value# (.get (.get memcache-service key#))]
+         cached-value# (.get memcache-service key#)]
      (if cached-value#
        (do
          (log/info "cache hit")
@@ -25,5 +26,11 @@
        (do
          (log/info "cache miss")
          (let [data# ~value-form]
-           (.put memcache-service key# data#)
+           (.put async-memcache-service key# data#)
            data#)))))
+
+;; sw# (Stopwatch/createStarted)
+;; (ThreadManager/createBackgroundThread ^Runnable (fn []
+;; (log/info "waiting for cache write")
+;; (.get fu#)
+;; (log/info "cache write complete in" (str sw#))))
