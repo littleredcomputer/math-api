@@ -34,6 +34,10 @@ circle.graph-point.theta {
   opacity: 0.5;
 }
 
+circle.graph-point.psi {
+  opacity: 0.5;
+}
+
 div.graph-container {
   background: #d0d4dc;
 }
