@@ -5,14 +5,14 @@
 
 
 (defn evolver
-  [t dt A B C]
+  [t dt A B C αDot0 βDot0 γDot0]
   (let [state-history (atom [])]
     ((evolve rigid-sysder
              A B C                                                ;; moments of inertia
              )
       (up 0.0
-          (up 1 0 0)
-          (up 0.1 0.1 0.1))
+          (up .01 0 0)
+          (up αDot0 βDot0 γDot0))
       (fn [t [_ [α β γ] _]] (swap! state-history conj [t α β γ]))
       dt
       t

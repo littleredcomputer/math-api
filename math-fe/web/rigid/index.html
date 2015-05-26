@@ -1,4 +1,4 @@
-<html lang="en" xxxng-app="Pendulum">
+<html lang="en" ng-app="Rigid">
 <head>
   <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/0.8.3/angular-material.min.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic">
@@ -7,16 +7,44 @@
   <meta name="viewport" content="initial-scale=1" />
   <meta charset="utf-8">
 </head>
-<body layout="column" xxxng-controller="DrivenPendulumCtrl as pend">
+<body layout="column" ng-controller="RigidCtrl as rigid">
 <md-toolbar layout="row">
-  <h1 class="md-toolbar-tools" layout-align-gt-sm="center">3d</h1>
+  <h1 class="md-toolbar-tools" layout-align-gt-sm="center">Rigid Rotation</h1>
 </md-toolbar>
+<md-progress-linear class="divider" md-mode="indeterminate" ng-show="rigid.busy"></md-progress-linear>
+<div layout="row" flex>
+  <div layout="column" flex id="content">
+    <md-content layout="column" flex>
+      <div layout="row" flex>
+        <div layout="column" flex=66>
+          <rigid-animation layout flex></rigid-animation>
+          <div layout flex id="rigid-graph" class="graph-container"></div>
+        </div>
+        <div layout="column" flex=33>
+          <div class="cm-documentation">
+            Here is some documentation and some example links.<br/>
+            <a ng-click="pend.set({A:0}); pend.go();" href>plain</a>,
+            <a ng-click="pend.set({g:-1.2,theta0:1.5}); pend.go();" href>antigravity</a>,
+            <a ng-click="pend.set({omega:32, theta0: 2.8, A:0.15}); pend.go();" href>vertical equilibrium</a>
+            <a ng-click="pend.set({});" href>reset</a>
+          </div>
+          <value-sliders></value-sliders>
+          <div layout="row" layout-align="space-around center">
+            <md-button ng-click="rigid.go();" class="md-fab">Go</md-button>
+          </div>
+        </div>
+      </div>
+    </md-content>
+  </div>
+</div>
+
 <!-- Angular Material Dependencies -->
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular-sanitize.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular-animate.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular-aria.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/angular_material/0.8.3/angular-material.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/threejs/r69/three.min.js"></script>
-<script src="rigid.js"></script>
+<script src="/js/services.js"></script>
+<script src="/rigid/rigid.js"></script>
 </body>
 </html>

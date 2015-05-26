@@ -278,12 +278,11 @@ function double_pendulum() {
 
 angular.module('Pendulum', ['ngMaterial', 'ngSanitize', 'cmServices'])
   .config(function($mdThemingProvider) {
-
   })
   .directive('valueSliders', function() {
     return {
       restrict: 'E',
-      templateUrl: '/templates/value-sliders.html'
+      templateUrl: '/templates/pendulum/value-sliders.html'
     };
   })
   .directive('doublePendulumAnimation', function() {

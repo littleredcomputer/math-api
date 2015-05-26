@@ -1,0 +1,5 @@
+<div layout="row" ng-repeat="value in pend.parameters">
+  <div flex="10" layout layout-align="center center"><span  ng-bind-html="value.nameHtml"></span></div>
+  <md-slider flex min="{{value.min}}" max="{{value.max}}" step="{{value.step}}" ng-model="value.value" aria-label="value.name"></md-slider>
+  <div flex="15" layout layout-align="center center">{{ value.value | number:2 }}</div>
+</div>

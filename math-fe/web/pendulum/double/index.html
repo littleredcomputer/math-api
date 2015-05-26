@@ -20,7 +20,7 @@
           <div layout flex id="pendulum-graph" class="graph-container"></div>
         </div>
         <div layout="column" flex=33>
-          <div class="pendulum-documentation">
+          <div class="cm-documentation">
             Here is some documentation and some example links.<br/>
             <a ng-click="pend.set({theta0:3.1416,phi0:3.1416}); pend.go();" href>almost vertical</a>,
             <a ng-click="pend.set({theta0:1.5708,phi0:1.5708,l1:0.8,m1:0.8}); pend.go();" href>little satellite</a>
@@ -41,6 +41,6 @@
 <script src="https://ajax.googleapis.com/ajax/libs/angular_material/0.8.3/angular-material.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
 <script src="/js/services.js"></script>
-<script src="/js/pendulum.js"></script>
+<script src="/pendulum/pendulum.js"></script>
 </body>
 </html>

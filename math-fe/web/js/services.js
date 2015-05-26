@@ -64,4 +64,4 @@ angular.module('cmServices', [])
         });
     };
     return ParameterManager;
-  }])
+  }]);
