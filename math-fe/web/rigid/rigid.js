@@ -1,5 +1,5 @@
 function rigid_animation($log) {
-  var animation, renderer, scene, camera, cube, animating=1;
+  var animation, renderer, scene, camera, cube;
   function setup() {
     console.log('setup');
     animation = document.getElementById('rigid-animation');
@@ -62,11 +62,11 @@ function rigid_animation($log) {
       var r1 = new THREE.Matrix4();
       var r2 = new THREE.Matrix4();
       var r3 = new THREE.Matrix4();
-      r1.makeRotationZ(d[1]);
-      r2.makeRotationX(d[2]);
+      r1.makeRotationZ(d[2]);
+      r2.makeRotationX(d[1]);
       r3.makeRotationZ(d[3]);
       m.multiplyMatrices(r1, r2);
-      m.multiply(r3)
+      m.multiply(r3);
       cube.rotation.setFromRotationMatrix(m);
       //cube.rotation.set(i,0,0,"XYZ");
       renderer.render(scene, camera);
