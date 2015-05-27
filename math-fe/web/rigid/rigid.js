@@ -1,15 +1,5 @@
 function rigid_animation($log) {
-  var animation, renderer, scene, camera, cube,
-    pi = Math.PI;
-  function wrap_pi(angle) {
-    var pi = Math.PI;
-    var a = angle;
-    if (-pi > angle || angle >= pi) {
-      a = angle - 2 * pi * Math.floor(angle / 2.0 / pi);
-      a = a < pi ? a : a - 2 * pi;
-    }
-    return a;
-  }
+  var animation, renderer, scene, camera, cube;
   function setup() {
     setup_animation();
     setup_graph();
@@ -61,133 +51,25 @@ function rigid_animation($log) {
     scene.add(cube);
   }
 
-  function draw(data, parameters) {
-    $log.debug('data received');
-
-    var margin = { left: 40, right: 20, top: 20, bottom: 25},
-      c = document.getElementById('rigid-graph'),
-      cWidth = c.clientWidth,
-      cHeight = c.clientHeight,
-      width = cWidth - margin.left - margin.right,
-      height = cHeight - margin.top - margin.bottom,
-      x_scale = d3.scale.linear().domain([0, parameters.t]).range([0, width]),
-      y_scale = d3.scale.linear().domain([-pi, pi]).range([height, 0]),
-      x_axis = d3.svg.axis().scale(x_scale).orient('bottom'),
-      y_axis = d3.svg.axis().scale(y_scale).orient('left');
-
-    d3.select('#rigid-graph svg').remove();
-    var svg = d3.select('#rigid-graph')
-      .append('svg')
-      .attr('width', cWidth)
-      .attr('height', cHeight)
-      .append('g')
-      .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
-
-    svg.append('g')
-      .attr('class','x_axis')
-      .attr('transform','translate(0,'+height+')')
-      .call(x_axis);
-    svg.append('g')
-      .attr('class', 'y_axis')
-      .call(y_axis);
-
-
-    svg.selectAll('circle.theta')
-      .data(data)
-      .enter()
-      .append('circle')
-      .attr('cx', function(d) {
-        return x_scale(d[0]);
-      })
-      .attr('cy', function(d) {
-        return y_scale(wrap_pi(d[1]));
-      })
-      .classed('graph-point theta', true)
-      .attr('r', 1)
-      .style('fill', '#400');
-
-    svg.selectAll('circle.phi')
-      .data(data)
-      .enter()
-      .append('circle')
-      .attr('cx', function(d) {
-        return x_scale(d[0]);
-      })
-      .attr('cy', function(d) {
-        return y_scale(wrap_pi(d[2]));
-      })
-      .classed('graph-point phi', true)
-      .attr('r', 1)
-      .style('fill', '#040');
-
-    svg.selectAll('circle.psi')
-      .data(data)
-      .enter()
-      .append('circle')
-      .attr('cx', function(d) {
-        return x_scale(d[0]);
-      })
-      .attr('cy', function(d) {
-        return y_scale(wrap_pi(d[3]));
-      })
-      .classed('graph-point psi', true)
-      .attr('r', 1)
-      .style('fill', '#004');
+  function animate(datum) {
+    // convert from ZXZ euler angles to rotation matrix
+    // (sigh)
+    var m = new THREE.Matrix4();
+    var r1 = new THREE.Matrix4();
+    var r2 = new THREE.Matrix4();
+    var r3 = new THREE.Matrix4();
+    r1.makeRotationZ(datum[2]);
+    r2.makeRotationX(datum[1]);
+    r3.makeRotationZ(datum[3]);
+    m.multiplyMatrices(r1, r2);
+    m.multiply(r3);
+    cube.rotation.setFromRotationMatrix(m);
+    renderer.render(scene, camera);
   }
-
-  function animate($interval, data, parameters) {
-    $log.debug('animate');
-    var i = 0;
-    var t0 = new Date();
-    var theta_points = d3.selectAll('#rigid-graph circle.theta')[0];
-    var phi_points = d3.selectAll('#rigid-graph circle.phi')[0];
-    var psi_points = d3.selectAll('#rigid-graph circle.psi')[0];
-
-    var timer = $interval(function() {
-      var d = data[i];
-      // convert from ZXZ euler angles to rotation matrix
-      // (sigh)
-      var m = new THREE.Matrix4();
-      var r1 = new THREE.Matrix4();
-      var r2 = new THREE.Matrix4();
-      var r3 = new THREE.Matrix4();
-      r1.makeRotationZ(d[2]);
-      r2.makeRotationX(d[1]);
-      r3.makeRotationZ(d[3]);
-      m.multiplyMatrices(r1, r2);
-      m.multiply(r3);
-      cube.rotation.setFromRotationMatrix(m);
-      //cube.rotation.set(i,0,0,"XYZ");
-      renderer.render(scene, camera);
-
-      theta_points[i].setAttribute('r', 3);
-      phi_points[i].setAttribute('r', 3);
-      psi_points[i].setAttribute('r', 3);
-      if (i > 0) {
-        theta_points[i-1].setAttribute('r', 1);
-        phi_points[i-1].setAttribute('r', 1);
-        psi_points[i-1].setAttribute('r', 1);
-      }
-
-      ++i;
-    }, 1000 * parameters.dt, data.length, false);
-    timer.then(function() {
-      $log.debug('interval complete');
-      var ms = new Date() - t0;
-      $log.debug(data.length, 'points in', ms, 'msec', 1000 * data.length/ms, 'Hz');
-    });
-    return timer;
-  }
-
-  function run() {
-  }
-
 
   return {
     setup: setup,
-    draw: draw,
-    animate: animate,
-    run: run
+    animate: animate
   }
 }
 angular.module('Rigid', ['ngMaterial', 'ngSanitize', 'cmServices'])
@@ -203,23 +85,35 @@ angular.module('Rigid', ['ngMaterial', 'ngSanitize', 'cmServices'])
       templateUrl: '/templates/rigid/value-sliders.html'
     }
   })
-  .factory()
-  .controller('RigidCtrl', ['$log', '$interval', 'parameterManager', function($log, $interval, parameterManager) {
+  .controller('RigidCtrl', ['$log', 'parameterManager', 'graphDraw',
+    function($log, parameterManager, graphDraw) {
     var rigid = rigid_animation($log);
     this.parameters = {
       alphaDot0: {nameHtml: 'α&#x307;<sub>0</sub>', min: -1, max: 1, step: 0.1, default: 0.1},
       betaDot0: {nameHtml: 'β&#x307;<sub>0</sub>', min: -1, max: 1, step: 0.1, default: 0.1},
       gammaDot0: {nameHtml: 'γ&#x307;<sub>0</sub>', min: -1, max: 1, step: 0.1, default: 0.1},
-      t: {nameHtml: 't', min: 1, max: 100, step: 2, default: 25},
+      t: {nameHtml: 't', min: 1, max: 100, step: 2, default: 25}
     };
     var pm = new parameterManager(this, '/api/sicm/rigid/evolve');
+    var graph = new graphDraw({
+      element: 'rigid-graph',
+      x: function(d) { return d[0]; },
+      y_min: -Math.PI,
+      y_max: Math.PI,
+      wrap_pi: true,
+      traces: {
+        theta: {y: function(d) { return d[1]; }, color: '#400'},
+        phi: {y: function(d) { return d[2]; }, color: '#040'},
+        psi: {y: function(d) { return d[3]; }, color: '#004'}
+      }
+    });
     this.busy = 0;
     this.init = rigid.setup;
     this.set = pm.set;
     this.go = function() {
       pm.fetch({dt: 1/60, A: 1, B: Math.sqrt(2), C: 2}, function(data, url_params) {
-        rigid.draw(data, url_params);
-        return rigid.animate($interval, data, url_params)
+        graph.draw(data, 0, url_params.t);
+        return graph.animate(data, url_params.dt, rigid.animate);
       })
     }
   }]);

@@ -13,8 +13,6 @@ import java.io.IOException;
 public class HelloServlet extends HttpServlet {
 
   @Override public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-    final IFn require = Clojure.var("clojure.core", "require");
-    //require.invoke(Clojure.read("math.euclid"));
     final IFn plus = Clojure.var("clojure.core", "+");
 
     resp.setContentType("text/plain; charset=utf-8");
