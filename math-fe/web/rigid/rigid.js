@@ -88,10 +88,14 @@ angular.module('Rigid', ['ngMaterial', 'ngSanitize', 'cmServices'])
   .controller('RigidCtrl', ['$log', 'parameterManager', 'graphDraw',
     function($log, parameterManager, graphDraw) {
     var rigid = rigid_animation($log);
+      var pi = Math.PI;
     this.parameters = {
-      alphaDot0: {nameHtml: 'α&#x307;<sub>0</sub>', min: -1, max: 1, step: 0.1, default: 0.1},
-      betaDot0: {nameHtml: 'β&#x307;<sub>0</sub>', min: -1, max: 1, step: 0.1, default: 0.1},
-      gammaDot0: {nameHtml: 'γ&#x307;<sub>0</sub>', min: -1, max: 1, step: 0.1, default: 0.1},
+      theta0: {nameHtml: 'θ<sub>0</sub>', min: -pi, max: pi, step: 0.05, default: 0.01},
+      phi0: {nameHtml: 'φ<sub>0</sub>', min: -pi, max: pi, step: 0.1, default: 0.1},
+      psi0: {nameHtml: 'ψ<sub>0</sub>', min: -pi, max: pi, step: 0.1, default: 0.1},
+      thetaDot0: {nameHtml: 'θ&prime;<sub>0</sub>', min: -1, max: 1, step: 0.1, default: 0.1},
+      phiDot0: {nameHtml: 'φ&prime;<sub>0</sub>', min: -1, max: 1, step: 0.1, default: 0.1},
+      psiDot0: {nameHtml: 'ψ&prime;<sub>0</sub>', min: -1, max: 1, step: 0.1, default: 0.1},
       t: {nameHtml: 't', min: 1, max: 100, step: 2, default: 25}
     };
     var pm = new parameterManager(this, '/api/sicm/rigid/evolve');
