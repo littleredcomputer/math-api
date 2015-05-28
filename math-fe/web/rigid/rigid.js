@@ -1,5 +1,25 @@
 function rigid_animation($log) {
+  var pi = Math.PI;
   var animation, renderer, scene, camera, cube;
+  var gimbals = [{
+    radius: 1.2,
+    color: 0x555588,
+    rotation: new THREE.Euler(0, 0, 0),
+    circle: null,
+    dot: null
+  }, {
+    radius: 1.1,
+    color: 0x885555,
+    rotation: new THREE.Euler(0, pi/2, 0),
+    circle: null,
+    dot: null
+  }, {
+    radius: 1.0,
+    color: 0x555588,
+    rotation: new THREE.Euler(0, 0, 0),
+    circle: null,
+    dot: null
+  }];
   function setup() {
     setup_animation();
     setup_graph();
@@ -7,17 +27,15 @@ function rigid_animation($log) {
   function setup_graph() {
   }
   function setup_animation() {
-    console.log('setup');
     animation = document.getElementById('rigid-animation');
     $log.debug('animation container w/h', animation.offsetWidth, animation.offsetHeight);
     renderer = new THREE.WebGLRenderer({antialias: true});
     renderer.setSize(animation.offsetWidth, animation.offsetHeight);
     animation.appendChild(renderer.domElement);
     scene = new THREE.Scene();
-    console.log('scene', scene);
     camera = new THREE.PerspectiveCamera(45, animation.offsetWidth / animation.offsetHeight, 1, 10000);
     var origin = new THREE.Vector3(0, 0, 0);
-    camera.position.set(2,2,2);
+    camera.position.set(3,2,2.5);
     camera.lookAt(origin);
     camera.updateProjectionMatrix();
     $log.debug('camera', camera);
@@ -39,6 +57,18 @@ function rigid_animation($log) {
     z.vertices.push(new THREE.Vector3(0,0,3));
     scene.add(new THREE.Line(z, new THREE.LineBasicMaterial({color: 0x0000ff})));
 
+    for (var i = 0; i < gimbals.length; ++i) {
+      var g = gimbals[i];
+      var circleGeo = new THREE.CircleGeometry(g.radius, 50, 0, 2*pi);
+      circleGeo.vertices.shift();
+      g.circle = new THREE.Line(circleGeo, new THREE.LineBasicMaterial({color: g.color}));
+      g.circle.setRotationFromEuler(g.rotation);
+      scene.add(g.circle);
+      var dotGeo = new THREE.SphereGeometry(0.05, 10, 10);
+      g.dot = new THREE.Mesh(dotGeo, new THREE.MeshPhongMaterial({color: g.color}));
+      scene.add(g.dot);
+    }
+
     var material = new THREE.MeshPhongMaterial();
     material.opacity = 0.5;
     material.transparent = true;
@@ -46,18 +76,29 @@ function rigid_animation($log) {
     // http://www.wolframalpha.com/input/?i=solve+b%5E2%2Bc%5E2%3D1%2C+a%5E2%2Bc%5E2%3DSqrt%5B2%5D%2C+a%5E2%2Bb%5E2%3D2
     var geometry = new THREE.BoxGeometry(1.09868,0.890446,0.455090);
     cube = new THREE.Mesh(geometry, material);
-    cube.rotateX(Math.PI/5);
-    cube.rotateY(Math.PI/5);
     scene.add(cube);
+    renderer.render(scene, camera);
   }
+
+  var m = new THREE.Matrix4(),
+    r1 = new THREE.Matrix4(),
+    r2 = new THREE.Matrix4(),
+    r3 = new THREE.Matrix4();
 
   function animate(datum) {
     // convert from ZXZ euler angles to rotation matrix
     // (sigh)
-    var m = new THREE.Matrix4();
-    var r1 = new THREE.Matrix4();
-    var r2 = new THREE.Matrix4();
-    var r3 = new THREE.Matrix4();
+    var theta = datum[1], phi = datum[2], psi = datum[3];
+    //thetaCircle.rotation.set(0, pi/2, datum[3], 'ZYX');
+    //thetaCircle.updateMatrix();
+
+    gimbals[0].dot.position.set(gimbals[0].radius*Math.cos(psi),
+      gimbals[0].radius*Math.sin(psi), 0);
+    gimbals[1].dot.position.set(0, gimbals[1].radius*Math.cos(theta),
+      gimbals[1].radius*Math.sin(theta));
+    gimbals[2].dot.position.set(gimbals[2].radius*Math.cos(phi),
+      gimbals[2].radius*Math.sin(phi), 0);
+
     r1.makeRotationZ(datum[2]);
     r2.makeRotationX(datum[1]);
     r3.makeRotationZ(datum[3]);
@@ -85,14 +126,14 @@ angular.module('Rigid', ['ngMaterial', 'ngSanitize', 'cmServices'])
       templateUrl: '/templates/rigid/value-sliders.html'
     }
   })
-  .controller('RigidCtrl', ['$log', 'parameterManager', 'graphDraw',
-    function($log, parameterManager, graphDraw) {
+  .controller('RigidCtrl', ['$scope', '$log', 'parameterManager', 'graphDraw',
+    function($scope, $log, parameterManager, graphDraw) {
     var rigid = rigid_animation($log);
       var pi = Math.PI;
     this.parameters = {
-      theta0: {nameHtml: 'θ<sub>0</sub>', min: -pi, max: pi, step: 0.05, default: 0.01},
-      phi0: {nameHtml: 'φ<sub>0</sub>', min: -pi, max: pi, step: 0.1, default: 0.1},
-      psi0: {nameHtml: 'ψ<sub>0</sub>', min: -pi, max: pi, step: 0.1, default: 0.1},
+      theta0: {nameHtml: 'θ<sub>0</sub>', min: -pi, max: pi, step: 0.05, default: 0},
+      phi0: {nameHtml: 'φ<sub>0</sub>', min: -pi, max: pi, step: 0.1, default: 0},
+      psi0: {nameHtml: 'ψ<sub>0</sub>', min: -pi, max: pi, step: 0.1, default: 0},
       thetaDot0: {nameHtml: 'θ&prime;<sub>0</sub>', min: -1, max: 1, step: 0.1, default: 0.1},
       phiDot0: {nameHtml: 'φ&prime;<sub>0</sub>', min: -1, max: 1, step: 0.1, default: 0.1},
       psiDot0: {nameHtml: 'ψ&prime;<sub>0</sub>', min: -1, max: 1, step: 0.1, default: 0.1},
@@ -112,7 +153,12 @@ angular.module('Rigid', ['ngMaterial', 'ngSanitize', 'cmServices'])
       }
     });
     this.busy = 0;
-    this.init = rigid.setup;
+    this.init = function() {
+      pm.watch($scope, function(parameters) {
+        rigid.animate([0, parameters.theta0.value, parameters.phi0.value, parameters.psi0.value]);
+      });
+      rigid.setup();
+    };
     this.set = pm.set;
     this.go = function() {
       pm.fetch({dt: 1/60, A: 1, B: Math.sqrt(2), C: 2}, function(data, url_params) {

@@ -136,23 +136,35 @@ angular.module('cmServices', [])
       angular.forEach(this.options.traces, function(trace, t) {
         dot_sets.push(d3.selectAll('#' + options.element + ' circle.' + t)[0]);
       });
+      console.log('dt', dt);
       console.log(dot_sets.length, 'dot sets');
       angular.forEach(dot_sets, function(dot_set) {
         console.log('dot set length', dot_set.length);
       });
+      var data_length = data.length;
+      //var wpn = window.performance.now;
       var t0 = new Date();
       var timer = $interval(function() {
+        var t01 = window.performance.now();
         action(data[i]);
+        var t02 = window.performance.now();
+        //console.log('action in', t02-t01, 'ms');
         angular.forEach(dot_sets, function(dot_set) {
           dot_set[i].setAttribute('r', 3);
         });
+        var t03 = window.performance.now();
+        //console.log('set attr in', t03-t02, 'ms');
         if (i > 0) {
           angular.forEach(dot_sets, function(dot_set) {
             dot_set[i-1].setAttribute('r', 1);
           });
         }
+        var t04 = window.performance.now();
+        //console.log('unset attr in', t04-t03, 'ms');
+        //console.log('total in', t04-t01, 'ms');
+
         i++;
-      }, 1000 * dt, data.length, false);
+      }, 1000 * dt, data_length, false);
       timer.then(function() {
         console.log('interval complete');
         var ms = new Date() - t0;

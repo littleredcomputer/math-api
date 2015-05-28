@@ -13,7 +13,7 @@
       (up 0.0
           (up θ0 φ0 ψ0)
           (up θdot0 φdot0 ψdot0))
-      (fn [t [_ [α β γ] _]] (swap! state-history conj [t α β γ]))
+      (fn [t [_ [θ φ ψ] _]] (swap! state-history conj [t θ φ ψ]))
       dt
       t
       1.0e-6
@@ -23,5 +23,5 @@
 (def equations
   (simplify ((rigid-sysder 'A 'B 'C)
               (up 't
-                  (up 'α 'β 'γ)
-                  (up 'αdot 'βdot 'γdot)))))
+                  (up 'θ 'φ 'ψ)
+                  (up 'θdot 'φdot 'ψdot)))))

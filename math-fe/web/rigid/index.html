@@ -23,10 +23,8 @@
         <div layout="column" flex=33>
           <div class="cm-documentation">
             Here is some documentation and some example links.<br/>
-            <a ng-click="pend.set({A:0}); pend.go();" href>plain</a>,
-            <a ng-click="pend.set({g:-1.2,theta0:1.5}); pend.go();" href>antigravity</a>,
-            <a ng-click="pend.set({omega:32, theta0: 2.8, A:0.15}); pend.go();" href>vertical equilibrium</a>
-            <a ng-click="pend.set({});" href>reset</a>
+            <a ng-click="rigid.set({});" href>reset</a>,
+            <a ng-click="rigid.set({theta0:-0.75,psi0:1,thetaDot0:0.3,t:60})" href>test</a>
           </div>
           <value-sliders></value-sliders>
           <div layout="row" layout-align="space-around center">
