@@ -158,7 +158,7 @@ angular.module('Pendulum', ['ngMaterial', 'ngSanitize', 'cmServices'])
       this.busy = 0;
       this.parameters = {
         theta0: {nameHtml: 'θ<sub>0</sub>', min: -3.1416, max: 3.1416, step: 0.1, default: 1},
-        thetaDot0: {nameHtml: 'θ&#x307;<sub>0</sub>', min: -3, max: 3, step: 0.1, default: 0},
+        thetaDot0: {nameHtml: 'θ&prime;<sub>0</sub>', min: -3, max: 3, step: 0.1, default: 0},
         omega: {nameHtml: 'ω', min: 0, max: 50, step: 0.1, default: 2*Math.sqrt(9.8)},
         g: {nameHtml: 'g', min: -2, max: 15, step: 0.1, default: 9.8},
         A: {nameHtml: 'A', min: 0, max: 0.3, step: 0.05, default: 0.1},
@@ -198,9 +198,9 @@ angular.module('Pendulum', ['ngMaterial', 'ngSanitize', 'cmServices'])
         l1: {nameHtml: 'l<sub>1</sub>', min: 0.1, max: 0.9, step: 0.1, default: 0.3 },
         m1: {nameHtml: 'm<sub>1</sub>', min: 0.1, max: 0.9, step: 0.1, default: 0.5 },
         theta0: {nameHtml: 'θ<sub>0</sub>', min: -3.1416, max: 3.1416, step: 0.1, default: 1},
-        thetaDot0: {nameHtml: 'θ&#x307;<sub>0</sub>', min: -3, max: 3, step: 0.1, default: 0},
+        thetaDot0: {nameHtml: 'θ&prime;<sub>0</sub>', min: -3, max: 3, step: 0.1, default: 0},
         phi0: {nameHtml: 'φ<sub>0</sub>', min: -3.1416, max: 3.1416, step: 0.1, default: -1},
-        phiDot0: {nameHtml: 'φ&#x307;<sub>0</sub>', min: -3, max: 3, step: 0.1, default: 0},
+        phiDot0: {nameHtml: 'φ&prime;<sub>0</sub>', min: -3, max: 3, step: 0.1, default: 0},
         g: {nameHtml: 'g', min: -2, max: 15, step: 0.1, default: 9.8},
         t: {nameHtml: 't', min: 1, max: 100, step: 2, default: 25}};
       var pm = new parameterManager(this, '/api/sicm/pendulum/double/evolve');

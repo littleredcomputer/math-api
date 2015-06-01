@@ -130,41 +130,44 @@ angular.module('cmServices', [])
     };
 
     GraphDraw.prototype.animate = function(data, dt, action) {
+      console.log('dt', dt, 'k', 1000*dt);
       var options = this.options;
       var i = 0;
       var dot_sets = [];
       angular.forEach(this.options.traces, function(trace, t) {
-        dot_sets.push(d3.selectAll('#' + options.element + ' circle.' + t)[0]);
+        dot_sets.push(document.getElementsByClassName('graph-point ' + t));
       });
       console.log('dt', dt);
       console.log(dot_sets.length, 'dot sets');
       angular.forEach(dot_sets, function(dot_set) {
         console.log('dot set length', dot_set.length);
       });
-      var data_length = data.length;
-      //var wpn = window.performance.now;
+
+      function animate_step() {
+        //action(data[i]);
+        for (var j = 0; j < dot_sets.length; ++j) {
+          var dot_set = dot_sets[j];
+          dot_set[i].setAttribute('r', 3);
+          if (i > 0) {
+            dot_set[i-1].setAttribute('r', 1);
+          }
+        }
+        //angular.forEach(dot_sets, function(dot_set) {
+        //  dot_set[i].setAttribute('r', 3);
+        //  if (i > 0) {
+        //    dot_set[i-1].setAttribute('r', 1);
+        //  }
+        //});
+        i++;
+      }
+
       var t0 = new Date();
       var timer = $interval(function() {
-        var t01 = window.performance.now();
-        action(data[i]);
-        var t02 = window.performance.now();
-        //console.log('action in', t02-t01, 'ms');
-        angular.forEach(dot_sets, function(dot_set) {
-          dot_set[i].setAttribute('r', 3);
-        });
-        var t03 = window.performance.now();
-        //console.log('set attr in', t03-t02, 'ms');
-        if (i > 0) {
-          angular.forEach(dot_sets, function(dot_set) {
-            dot_set[i-1].setAttribute('r', 1);
-          });
-        }
-        var t04 = window.performance.now();
-        //console.log('unset attr in', t04-t03, 'ms');
-        //console.log('total in', t04-t01, 'ms');
-
-        i++;
-      }, 1000 * dt, data_length, false);
+        var t0 = window.performance.now();
+        animate_step();
+        var t1 = window.performance.now();
+        //console.log('animate step', t1-t0);
+      }, 1000 * dt, data.length, false);
       timer.then(function() {
         console.log('interval complete');
         var ms = new Date() - t0;

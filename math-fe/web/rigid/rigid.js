@@ -128,43 +128,45 @@ angular.module('Rigid', ['ngMaterial', 'ngSanitize', 'cmServices'])
   })
   .controller('RigidCtrl', ['$scope', '$log', 'parameterManager', 'graphDraw',
     function($scope, $log, parameterManager, graphDraw) {
-    var rigid = rigid_animation($log);
+      var rigid = rigid_animation($log);
       var pi = Math.PI;
-    this.parameters = {
-      theta0: {nameHtml: 'θ<sub>0</sub>', min: -pi, max: pi, step: 0.05, default: 0},
-      phi0: {nameHtml: 'φ<sub>0</sub>', min: -pi, max: pi, step: 0.1, default: 0},
-      psi0: {nameHtml: 'ψ<sub>0</sub>', min: -pi, max: pi, step: 0.1, default: 0},
-      thetaDot0: {nameHtml: 'θ&prime;<sub>0</sub>', min: -1, max: 1, step: 0.1, default: 0.1},
-      phiDot0: {nameHtml: 'φ&prime;<sub>0</sub>', min: -1, max: 1, step: 0.1, default: 0.1},
-      psiDot0: {nameHtml: 'ψ&prime;<sub>0</sub>', min: -1, max: 1, step: 0.1, default: 0.1},
-      t: {nameHtml: 't', min: 1, max: 100, step: 2, default: 25}
-    };
-    var pm = new parameterManager(this, '/api/sicm/rigid/evolve');
-    var graph = new graphDraw({
-      element: 'rigid-graph',
-      x: function(d) { return d[0]; },
-      y_min: -Math.PI,
-      y_max: Math.PI,
-      wrap_pi: true,
-      traces: {
-        theta: {y: function(d) { return d[1]; }, color: '#400'},
-        phi: {y: function(d) { return d[2]; }, color: '#040'},
-        psi: {y: function(d) { return d[3]; }, color: '#004'}
-      }
-    });
-    this.busy = 0;
-    this.init = function() {
-      pm.watch($scope, function(parameters) {
-        rigid.animate([0, parameters.theta0.value, parameters.phi0.value, parameters.psi0.value]);
+      this.parameters = {
+        theta0: {nameHtml: 'θ<sub>0</sub>', min: -pi, max: pi, step: 0.05, default: 0},
+        phi0: {nameHtml: 'φ<sub>0</sub>', min: -pi, max: pi, step: 0.1, default: 0},
+        psi0: {nameHtml: 'ψ<sub>0</sub>', min: -pi, max: pi, step: 0.1, default: 0},
+        thetaDot0: {nameHtml: 'θ&prime;<sub>0</sub>', min: -1, max: 1, step: 0.1, default: 0.1},
+        phiDot0: {nameHtml: 'φ&prime;<sub>0</sub>', min: -1, max: 1, step: 0.1, default: 0.1},
+        psiDot0: {nameHtml: 'ψ&prime;<sub>0</sub>', min: -1, max: 1, step: 0.1, default: 0.1},
+        t: {nameHtml: 't', min: 1, max: 100, step: 2, default: 25}
+      };
+      var pm = new parameterManager(this, '/api/sicm/rigid/evolve');
+      var graph = new graphDraw({
+        element: 'rigid-graph',
+        x: function(d) { return d[0]; },
+        y_min: -Math.PI,
+        y_max: Math.PI,
+        wrap_pi: true,
+        traces: {
+          theta: {y: function(d) { return d[1]; }, color: '#400'},
+          phi: {y: function(d) { return d[2]; }, color: '#040'},
+          psi: {y: function(d) { return d[3]; }, color: '#004'}
+        }
       });
-      rigid.setup();
-    };
-    this.set = pm.set;
-    this.go = function() {
-      pm.fetch({dt: 1/60, A: 1, B: Math.sqrt(2), C: 2}, function(data, url_params) {
-        graph.draw(data, 0, url_params.t);
-        return graph.animate(data, url_params.dt, rigid.animate);
-      })
-    }
-  }]);
+      this.busy = 0;
+      this.init = function() {
+        pm.watch($scope, function(parameters) {
+          rigid.animate([0, parameters.theta0.value, parameters.phi0.value, parameters.psi0.value]);
+        });
+        rigid.setup();
+      };
+      this.set = pm.set;
+      this.go = function() {
+        var dt = this.parameters.t.value/500;
+        console.log('dt computed as ', dt, 't', this.parameters.t.value);
+        pm.fetch({dt: dt, A: 1, B: Math.sqrt(2), C: 2}, function(data, url_params) {
+          graph.draw(data, 0, url_params.t);
+          return graph.animate(data, url_params.dt, rigid.animate);
+        })
+      }
+    }]);
 
