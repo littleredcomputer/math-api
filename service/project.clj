@@ -4,6 +4,8 @@
   :license {}
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [org.clojure/tools.logging "0.3.1"]
+                 [org.slf4j/slf4j-jdk14 "1.7.12"]
+                 [org.apache.logging.log4j/log4j-to-slf4j "2.3"]
                  [ring/ring-core "1.3.2"]
                  [ring/ring-servlet "1.3.2"]
                  [ring/ring-defaults "0.1.5"]
