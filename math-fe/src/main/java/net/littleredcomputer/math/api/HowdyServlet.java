@@ -6,8 +6,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 public class HowdyServlet extends HttpServlet {
-    @Override public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        resp.setContentType("text/plain; charset=utf-8");
-        resp.getWriter().println("hello from java, Colin!");
-    }
+  @Override public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    resp.setContentType("text/plain; charset=utf-8");
+    resp.getWriter().println("hello from java, Colin!");
+  }
 }

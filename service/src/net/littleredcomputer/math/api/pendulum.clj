@@ -6,11 +6,12 @@
             [ring.middleware
              [defaults :refer [wrap-defaults api-defaults]]
              [json :refer [wrap-json-response]]]
-            [compojure.core :refer [defroutes GET POST]]
+            [compojure.core :refer [defroutes GET POST ANY]]
             [net.littleredcomputer.math.api.middleware :refer [log-params cached]]
             [net.littleredcomputer.math.examples
              [driven-pendulum :as driven]
-             [double-pendulum :as double]])
+             [double-pendulum :as double]]
+            [clojure.tools.logging :as log])
   (:gen-class :extends javax.servlet.http.HttpServlet))
 
 (set! *warn-on-reflection* true)
@@ -30,7 +31,13 @@
                  (Double/parseDouble (param params)))]
       (response (cached (assoc params :uri uri) (apply double/evolver args)))))
   (GET "/api/sicm/pendulum/double/equations" []
-    (-> double/equations (pp/write :stream nil) response (content-type "text/plain; charset=UTF-8"))))
+    (-> double/equations (pp/write :stream nil) response (content-type "text/plain; charset=UTF-8")))
+  (ANY "/api/sicm/pendulum/any" request
+    (log/info request)
+    (-> request
+        (assoc :message "this is from any")
+        (dissoc :servlet-context :servlet-context-path :servlet-response :servlet :servlet-request :body )
+        response)))
 
 (defservice (-> pendulum
                 log-params
