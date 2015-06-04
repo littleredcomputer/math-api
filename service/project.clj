@@ -11,8 +11,6 @@
                  [javax.servlet/javax.servlet-api "3.1.0"]
                  [compojure "1.3.4"]
                  [net.littleredcomputer/math "0.0.1-SNAPSHOT"]
-                 [com.google.appengine/appengine-api-1.0-sdk "1.9.20"]
-                 ]
-  :aot [net.littleredcomputer.math.api.pendulum
-        net.littleredcomputer.math.api.rigid]
+                 [com.google.appengine/appengine-api-1.0-sdk "1.9.20"]]
+  :aot [net.littleredcomputer.math.api.sicm]
   )

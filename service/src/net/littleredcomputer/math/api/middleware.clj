@@ -1,10 +1,14 @@
 (ns net.littleredcomputer.math.api.middleware
-  (:require [clojure.tools.logging :as log])
+  (:require [clojure.tools.logging :as log]
+            [net.littleredcomputer.math.api.stats :as stats])
   (:import [com.google.appengine.api.memcache MemcacheServiceFactory AsyncMemcacheService MemcacheService]))
 
 (set! *warn-on-reflection* true)
+
 (defonce ^AsyncMemcacheService async-memcache-service (MemcacheServiceFactory/getAsyncMemcacheService))
 (defonce ^MemcacheService memcache-service (MemcacheServiceFactory/getMemcacheService))
+(defonce parameter-cache-probes (stats/make-counter "parameter-cache-probes"))
+(defonce parameter-cache-hits (stats/make-counter "parameter-cache-hits"))
 
 (defn log-params
   [handler]
@@ -19,9 +23,11 @@
   [key-form value-form]
   `(let [key# ~key-form
          cached-value# (.get memcache-service key#)]
+     (parameter-cache-probes)
      (if cached-value#
        (do
          (log/info "cache hit")
+         (parameter-cache-hits)
          cached-value#)
        (do
          (log/info "cache miss")

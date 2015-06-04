@@ -1,7 +1,9 @@
+.nrepl-port
 .DS_Store
 out/
 target/
 .idea/workspace.xml
+.idea/replstate.xml
 .idea/tasks.xml
 .lein-failures
 .lein-repl-history
