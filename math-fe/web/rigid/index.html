@@ -13,26 +13,20 @@
 </md-toolbar>
 <md-progress-linear class="divider" md-mode="indeterminate" ng-show="rigid.busy"></md-progress-linear>
 <div layout="row" flex>
-  <div layout="column" flex id="content">
-    <md-content layout="column" flex>
-      <div layout="row" flex>
-        <div layout="column" flex=66>
-          <rigid-animation layout flex></rigid-animation>
-          <div layout flex id="rigid-graph" class="graph-container"></div>
-        </div>
-        <div layout="column" flex=33>
-          <div class="cm-documentation">
-            Here is some documentation and some example links.<br/>
-            <a ng-click="rigid.set({});" href>reset</a>,
-            <a ng-click="rigid.set({theta0:0.3,psi0:1,thetaDot0:0.3,t:45})" href>test</a>
-          </div>
-          <value-sliders></value-sliders>
-          <div layout="row" layout-align="space-around center">
-            <md-button ng-click="rigid.go();" class="md-fab">Go</md-button>
-          </div>
-        </div>
-      </div>
-    </md-content>
+  <div layout="column" flex=66 class="presentation">
+    <rigid-animation id="rigid-animation" flex></rigid-animation>
+    <div layout flex id="rigid-graph" class="graph-container"></div>
+  </div>
+  <div layout="column" flex=33>
+    <div class="cm-documentation">
+      Here is some documentation and some example links.<br/>
+      <a ng-click="rigid.set({});" href>reset</a>,
+      <a ng-click="rigid.set({theta0:0.3,psi0:1,thetaDot0:0.3,t:45})" href>test</a>
+    </div>
+    <value-sliders></value-sliders>
+    <div layout="row" layout-align="space-around center">
+      <md-button ng-click="rigid.go();" class="md-fab">Go</md-button>
+    </div>
   </div>
 </div>
 

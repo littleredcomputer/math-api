@@ -12,28 +12,22 @@
 </md-toolbar>
 <md-progress-linear class="divider" md-mode="indeterminate" ng-show="pend.busy"></md-progress-linear>
 <div layout="row" flex>
-  <div layout="column" flex id="content">
-    <md-content layout="column" flex>
-      <div layout="row" flex>
-        <div layout="column" flex=66>
-          <driven-pendulum-animation layout flex></driven-pendulum-animation>
-          <div layout flex id="pendulum-graph" class="graph-container"></div>
-        </div>
-        <div layout="column" flex=33>
-          <div class="pendulum-documentation">
-            Here is some documentation and some example links.<br/>
-            <a ng-click="pend.set({A:0}); pend.go();" href>plain</a>,
-            <a ng-click="pend.set({g:-1.2,theta0:1.5}); pend.go();" href>antigravity</a>,
-            <a ng-click="pend.set({omega:32, theta0: 2.8, A:0.15}); pend.go();" href>vertical equilibrium</a>
-            <a ng-click="pend.set({});" href>reset</a>
-          </div>
-          <value-sliders></value-sliders>
-          <div layout="row" layout-align="space-around center">
-            <md-button ng-click="pend.go();" class="md-fab">Go</md-button>
-          </div>
-        </div>
-      </div>
-    </md-content>
+  <div layout="column" flex=66 class="presentation">
+    <driven-pendulum-animation flex=50 id="pendulum-animation" class="animation-container" ng-init="pend.init()"></driven-pendulum-animation>
+    <div flex=50 id="pendulum-graph" class="graph-container"></div>
+  </div>
+  <div layout="column" flex=33>
+    <div class="cm-documentation">
+      Here is some documentation and some example links.<br/>
+      <a ng-click="pend.set({A:0}); pend.go();" href>plain</a>,
+      <a ng-click="pend.set({g:-1.2,theta0:1.5}); pend.go();" href>antigravity</a>,
+      <a ng-click="pend.set({omega:32, theta0: 2.8, A:0.15}); pend.go();" href>vertical equilibrium</a>
+      <a ng-click="pend.set({});" href>reset</a>
+    </div>
+    <value-sliders></value-sliders>
+    <div layout="row" layout-align="space-around center">
+      <md-button ng-click="pend.go();" class="md-fab">Go</md-button>
+    </div>
   </div>
 </div>
 <!-- Angular Material Dependencies -->

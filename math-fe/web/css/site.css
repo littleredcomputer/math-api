@@ -42,12 +42,16 @@ div.graph-container {
   background: #d0d4dc;
 }
 
-div.animation-container {
+.animation-container {
   background: #b2b6be;
 }
 
 div.cm-documentation {
   padding: 5px;
+}
+
+div.presentation {
+  height: 800px;
 }
 
 /* odd that we need this... */

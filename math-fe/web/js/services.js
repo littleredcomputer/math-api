@@ -106,7 +106,7 @@ angular.module('cmServices', [])
 
       svg.append('g')
         .attr('class','x_axis')
-        .attr('transform','translate(0,'+height+')')
+        .attr('transform','translate(0,' + height + ')')
         .call(x_axis);
       svg.append('g')
         .attr('class', 'y_axis')
@@ -132,16 +132,10 @@ angular.module('cmServices', [])
     };
 
     GraphDraw.prototype.animate = function(data, dt, action) {
-      console.log('dt', dt, 'k', 1000*dt);
       var i = 0;
       var dot_sets = [];
       angular.forEach(this.options.traces, function(trace, t) {
         dot_sets.push(document.getElementsByClassName('graph-point ' + t));
-      });
-      console.log('dt', dt);
-      console.log(dot_sets.length, 'dot sets');
-      angular.forEach(dot_sets, function(dot_set) {
-        console.log('dot set length', dot_set.length);
       });
 
       function animate_step() {
@@ -161,9 +155,8 @@ angular.module('cmServices', [])
         animate_step();
       }, 1000 * dt, data.length, false);
       timer.then(function() {
-        console.log('interval complete');
         var ms = new Date() - t0;
-        console.log(data.length, 'points in', ms, 'msec', 1000 * data.length/ms, 'Hz');
+        $log.debug(data.length, 'points in', ms, 'msec', 1000 * data.length/ms, 'Hz');
       });
       return timer;
     };
