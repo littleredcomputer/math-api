@@ -24,12 +24,12 @@
   #(-> % (* ω) (+ φ) cos (* A)))
 
 (defn pend-state-derivative
-  [m l g drive]
+  [m l g A ω φ]
   (Lagrangian->state-derivative
-    (L-pend m l g drive)))
+    (L-pend m l g (periodic-drive A ω φ))))
 
 (def equations
-  (simplify ((pend-state-derivative 'm 'l 'g (periodic-drive 'A 'ω 'φ))
+  (simplify ((pend-state-derivative 'm 'l 'g 'A 'ω 'φ)
               (up 't 'θ_0 'θdot_0))))
 
 (defn evolver
@@ -39,8 +39,10 @@
     ((evolve pend-state-derivative
              1.0 ;; mass of bob
              1.0 ;; length of rod
-             g ;; acceleration due to gravity
-             drive ;; motion of pendulum support
+             g   ;; acceleration due to gravity
+             A   ;; amplitude of drive
+             ω   ;; frequency of drive
+             0   ;; phase of drive
              )
       (up 0.0
           θ0
