@@ -56,7 +56,8 @@ angular.module('cmServices', [])
           })
         })
         .error(function(data, status) {
-          $log.error(data, status);
+          $log.error(status);
+          document.write(data);
         })
         .finally(function() {
           --self.controller.busy;
@@ -65,8 +66,8 @@ angular.module('cmServices', [])
     };
     return ParameterManager;
   }])
-  .constant('margin', { left: 40, right: 20, top: 20, bottom: 25 })
-  .factory('graphDraw', ['$interval', 'margin', function($interval, margin) {
+  .factory('graphDraw', ['$interval', '$log', function($interval, $log) {
+    var margin = { left: 40, right: 20, top: 20, bottom: 25 };
     function id(x) { return x; }
     function wrap_pi(angle) {
       var pi = Math.PI;
@@ -86,6 +87,7 @@ angular.module('cmServices', [])
       var container = document.getElementById(options.element);
       var cWidth = container.clientWidth;
       var cHeight = container.clientHeight;
+      $log.debug('graph container', cWidth, cHeight);
       var height = cHeight - margin.top - margin.bottom;
       var width = cWidth - margin.left - margin.right;
       var x_scale = d3.scale.linear().domain([x_min, x_max]).range([0, width]);
@@ -131,7 +133,6 @@ angular.module('cmServices', [])
 
     GraphDraw.prototype.animate = function(data, dt, action) {
       console.log('dt', dt, 'k', 1000*dt);
-      var options = this.options;
       var i = 0;
       var dot_sets = [];
       angular.forEach(this.options.traces, function(trace, t) {
@@ -144,7 +145,7 @@ angular.module('cmServices', [])
       });
 
       function animate_step() {
-        //action(data[i]);
+        action(data[i]);
         for (var j = 0; j < dot_sets.length; ++j) {
           var dot_set = dot_sets[j];
           dot_set[i].setAttribute('r', 3);
@@ -152,21 +153,12 @@ angular.module('cmServices', [])
             dot_set[i-1].setAttribute('r', 1);
           }
         }
-        //angular.forEach(dot_sets, function(dot_set) {
-        //  dot_set[i].setAttribute('r', 3);
-        //  if (i > 0) {
-        //    dot_set[i-1].setAttribute('r', 1);
-        //  }
-        //});
         i++;
       }
 
       var t0 = new Date();
       var timer = $interval(function() {
-        var t0 = window.performance.now();
         animate_step();
-        var t1 = window.performance.now();
-        //console.log('animate step', t1-t0);
       }, 1000 * dt, data.length, false);
       timer.then(function() {
         console.log('interval complete');
