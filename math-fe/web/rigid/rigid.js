@@ -2,6 +2,7 @@ function rigid_animation($log) {
   var pi = Math.PI;
   var animation, renderer, scene, camera, cube;
   var angular_momentum = new THREE.Vector3(), L;
+  var origin = new THREE.Vector3(0, 0, 0);
   var gimbals = [{
     radius: 1.2,
     color: 0x555588,
@@ -21,13 +22,9 @@ function rigid_animation($log) {
     circle: null,
     dot: null
   }];
+
+
   function setup() {
-    setup_animation();
-    setup_graph();
-  }
-  function setup_graph() {
-  }
-  function setup_animation() {
     animation = document.getElementById('rigid-animation');
     $log.debug('animation container w/h', animation.offsetWidth, animation.offsetHeight);
     renderer = new THREE.WebGLRenderer({antialias: true});
@@ -35,7 +32,6 @@ function rigid_animation($log) {
     animation.appendChild(renderer.domElement);
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(45, animation.offsetWidth / animation.offsetHeight, 1, 10000);
-    var origin = new THREE.Vector3(0, 0, 0);
     camera.position.set(3,2,2.5);
     camera.lookAt(origin);
     camera.updateProjectionMatrix();
@@ -112,8 +108,10 @@ function rigid_animation($log) {
     m.multiply(r3);
     cube.rotation.setFromRotationMatrix(m);
     if (datum[4]) {
-      angular_momentum.set(datum[4][0], datum[4][1], datum[4][2]);
+      var am = datum[4];
+      angular_momentum.set(am[0], am[1], am[2]);
       angular_momentum.normalize();
+      // this is said to be expensive, but what else to do?
       L.verticesNeedUpdate = true;
     }
     renderer.render(scene, camera);
