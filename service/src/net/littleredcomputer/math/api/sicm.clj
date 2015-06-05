@@ -6,7 +6,7 @@
             [ring.middleware
              [defaults :refer [wrap-defaults api-defaults]]
              [json :refer [wrap-json-response]]]
-            [compojure.core :refer [defroutes GET POST ANY]]
+            [compojure.core :refer [defroutes GET]]
             [net.littleredcomputer.math.api.middleware :refer [log-params cached]]
             [net.littleredcomputer.math.examples
              [driven-pendulum :as driven]
@@ -36,21 +36,22 @@
   sicm
   (sicm-get "/api/sicm/pendulum/driven/evolve" driven/evolver
             [:t :dt :A :omega :g :theta0 :thetaDot0])
-  (GET "/api/sicm/pendulum/driven/equations" []
-    (-> driven/equations (pp/write :stream nil) response text-plain))
+  ;(GET "/api/sicm/pendulum/driven/equations" []
+  ;  (-> driven/equations (pp/write :stream nil) response text-plain))
   (sicm-get "/api/sicm/pendulum/double/evolve" double/evolver
             [:t :dt :g :m1 :l1 :theta0 :thetaDot0 :m2 :l2 :phi0 :phiDot0])
-  (GET "/api/sicm/pendulum/double/equations" []
-    (-> double/equations (pp/write :stream nil) response text-plain))
+  ;(GET "/api/sicm/pendulum/double/equations" []
+  ;  (-> double/equations (pp/write :stream nil) response text-plain))
   (sicm-get "/api/sicm/rigid/evolve" rigid/evolver
             [:t :dt :A :B :C :theta0 :phi0 :psi0 :thetaDot0 :phiDot0 :psiDot0])
-  (GET "/api/sicm/rigid/equations" []
-    (-> rigid/equations (pp/write :stream nil) response text-plain))
+  ;(GET "/api/sicm/rigid/equations" []
+  ;  (-> rigid/equations (pp/write :stream nil) response text-plain))
   (GET "/api/sicm/version" []
-    (-> "1.0" response (content-type "text/plain"))))
+    (-> "1.0" response text-plain)))
 
 (defservice (-> sicm
                 log-params
                 wrap-json-response
                 (wrap-defaults api-defaults)))
+
 

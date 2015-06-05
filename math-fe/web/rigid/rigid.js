@@ -1,6 +1,7 @@
 function rigid_animation($log) {
   var pi = Math.PI;
   var animation, renderer, scene, camera, cube;
+  var angular_momentum = new THREE.Vector3(), L;
   var gimbals = [{
     radius: 1.2,
     color: 0x555588,
@@ -45,17 +46,22 @@ function rigid_animation($log) {
     scene.add(light);
 
     var x = new THREE.Geometry();
-    x.vertices.push(new THREE.Vector3());
+    x.vertices.push(origin);
     x.vertices.push(new THREE.Vector3(3,0,0));
     scene.add(new THREE.Line(x, new THREE.LineBasicMaterial({color: 0xff0000})));
     var y = new THREE.Geometry();
-    y.vertices.push(new THREE.Vector3());
+    y.vertices.push(origin);
     y.vertices.push(new THREE.Vector3(0,3,0));
-    scene.add(new THREE.Line(y, new THREE.LineBasicMaterial({lineWidth: 3, color: 0x00ff00})));
+    scene.add(new THREE.Line(y, new THREE.LineBasicMaterial({color: 0x00ff00})));
     var z = new THREE.Geometry();
-    z.vertices.push(new THREE.Vector3());
+    z.vertices.push(origin);
     z.vertices.push(new THREE.Vector3(0,0,3));
     scene.add(new THREE.Line(z, new THREE.LineBasicMaterial({color: 0x0000ff})));
+    L = new THREE.Geometry();
+    L.vertices.push(origin);
+    L.vertices.push(angular_momentum);
+    scene.add(new THREE.Line(L, new THREE.LineBasicMaterial({color: 0xffff00})));
+
 
     for (var i = 0; i < gimbals.length; ++i) {
       var g = gimbals[i];
@@ -105,7 +111,13 @@ function rigid_animation($log) {
     m.multiplyMatrices(r1, r2);
     m.multiply(r3);
     cube.rotation.setFromRotationMatrix(m);
+    if (datum[4]) {
+      angular_momentum.set(datum[4][0], datum[4][1], datum[4][2]);
+      angular_momentum.normalize();
+      L.verticesNeedUpdate = true;
+    }
     renderer.render(scene, camera);
+    //$log.debug(datum);
   }
 
   return {

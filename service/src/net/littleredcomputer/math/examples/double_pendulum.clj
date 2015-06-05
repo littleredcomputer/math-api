@@ -55,9 +55,9 @@
       {:compile true})
     @state-history))
 
-(def equations
-  (simplify ((pend-state-derivative 'm_1 'm_2 'l_1 'l_2 'g)
-              (up 't
-                  (up 'θ_0 'φ_0)
-                  (up 'θdot_0 'φdot_0)))))
+;(def equations
+;  (simplify ((pend-state-derivative 'm_1 'm_2 'l_1 'l_2 'g)
+;              (up 't
+;                  (up 'θ_0 'φ_0)
+;                  (up 'θdot_0 'φdot_0)))))
 

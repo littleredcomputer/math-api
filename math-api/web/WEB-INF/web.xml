@@ -3,19 +3,27 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
          version="3.1">
-    <mime-mapping>
-        <extension>clj</extension>
-        <mime-type>text/plain;charset=UTF-8</mime-type>
-    </mime-mapping>
-    <welcome-file-list>
-        <welcome-file>index.html</welcome-file>
-    </welcome-file-list>
-    <servlet>
-        <servlet-name>sicm</servlet-name>
-        <servlet-class>net.littleredcomputer.math.api.sicm</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>sicm</servlet-name>
-        <url-pattern>/api/sicm/*</url-pattern>
-    </servlet-mapping>
+  <mime-mapping>
+    <extension>clj</extension>
+    <mime-type>text/plain;charset=UTF-8</mime-type>
+  </mime-mapping>
+  <welcome-file-list>
+    <welcome-file>index.html</welcome-file>
+  </welcome-file-list>
+  <servlet>
+    <servlet-name>sicm</servlet-name>
+    <servlet-class>net.littleredcomputer.math.api.sicm</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>stats</servlet-name>
+    <servlet-class>net.littleredcomputer.math.api.stats_servlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>sicm</servlet-name>
+    <url-pattern>/api/sicm/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>stats</servlet-name>
+    <url-pattern>/api/stats/*</url-pattern>
+  </servlet-mapping>
 </web-app>

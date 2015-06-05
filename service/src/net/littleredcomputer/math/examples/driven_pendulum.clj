@@ -28,9 +28,9 @@
   (Lagrangian->state-derivative
     (L-pend m l g (periodic-drive A ω φ))))
 
-(def equations
-  (simplify ((pend-state-derivative 'm 'l 'g 'A 'ω 'φ)
-              (up 't 'θ_0 'θdot_0))))
+;(def equations
+;  (simplify ((pend-state-derivative 'm 'l 'g 'A 'ω 'φ)
+;              (up 't 'θ_0 'θdot_0))))
 
 (defn evolver
   [t dt A ω g θ0 θdot0]
