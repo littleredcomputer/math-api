@@ -7,13 +7,15 @@
 
 (defonce ^AsyncMemcacheService async-memcache-service (MemcacheServiceFactory/getAsyncMemcacheService))
 (defonce ^MemcacheService memcache-service (MemcacheServiceFactory/getMemcacheService))
-(defonce parameter-cache-probes (stats/make-counter "parameter-cache-probes"))
-(defonce parameter-cache-hits (stats/make-counter "parameter-cache-hits"))
+(defonce count-cache-miss (stats/make-counter "cache-miss"))
+(defonce count-cache-hit (stats/make-counter "cache-hit"))
+(defonce count-request (stats/make-counter "request"))
 
 (defn log-params
   [handler]
   (fn [request]
     (log/info (:uri request) (:params request))
+    (count-request)
     (handler request)))
 
 (defmacro cached
@@ -23,14 +25,14 @@
   [key-form value-form]
   `(let [key# ~key-form
          cached-value# (.get memcache-service key#)]
-     (parameter-cache-probes)
      (if cached-value#
        (do
          (log/info "cache hit")
-         (parameter-cache-hits)
+         (count-cache-hit)
          cached-value#)
        (do
          (log/info "cache miss")
+         (count-cache-miss)
          (let [data# ~value-form]
            (.put async-memcache-service key# data#)
            data#)))))

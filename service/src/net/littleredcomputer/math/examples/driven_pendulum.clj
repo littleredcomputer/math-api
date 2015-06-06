@@ -3,7 +3,7 @@
   (:require [math.env :refer :all]
             [math.mechanics.lagrange :refer :all]))
 
-(defn- T-pend
+(defn T-pend
   [m l _ y]
   (let [y' (D y)]
     (fn [[t θ θdot]]
@@ -12,7 +12,7 @@
             (square (y' t))
             (* 2 l (y' t) θdot (sin θ)))))))
 
-(defn- V-pend
+(defn V-pend
   [m l g y]
   (fn [[t θ _]]
     (* m g (- (y t) (* l (cos θ))))))

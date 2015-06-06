@@ -1,5 +1,4 @@
-(ns net.littleredcomputer.math.api.stats
-  (:require [clojure.tools.logging :as log]))
+(ns net.littleredcomputer.math.api.stats)
 
 (defonce ^:private counters (atom {}))
 
@@ -9,13 +8,12 @@
 
 (defn make-counter
   [name]
-  (let [counter (atom 0)]
-    (swap! counters
-           (fn [c]
-             (when (contains? c name)
-               (throw (IllegalStateException.
-                        (str "cannot redefine counter " name))))
-             (assoc c name counter)))
+  (swap! counters
+         (fn [c]
+           (if-not (contains? c name)
+             (assoc c name (atom 0))
+             c)))
+  (let [counter (@counters name)]
     (fn f
       ([] (f 1))
       ([x] (swap! counter + x)))))

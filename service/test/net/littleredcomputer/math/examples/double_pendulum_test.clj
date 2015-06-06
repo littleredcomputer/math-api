@@ -2,14 +2,14 @@
   (:refer-clojure :exclude [+ - * /])
   (:require [math.env :refer :all]
             [math.mechanics.lagrange :refer :all]
-            [net.littleredcomputer.math.examples.double-pendulum :refer :all]
+            [net.littleredcomputer.math.examples.double-pendulum :as double]
             [clojure.test :refer :all]))
 
 (deftest equations
   (let [state (up 't (up 'θ 'φ) (up 'θdot 'φdot))
-        V (V-double-pend 'm1 'm2 'l1 'l2 'g)
-        T (T-double-pend 'm1 'm2 'l1 'l2 'g)
-        L (L-double-pend 'm1 'm2 'l1 'l2 'g)]
+        V (double/V-double-pend 'm1 'm2 'l1 'l2 'g)
+        T (double/T-double-pend 'm1 'm2 'l1 'l2 'g)
+        L (double/L-double-pend 'm1 'm2 'l1 'l2 'g)]
     (is (= '(+ (* -1 (cos θ) g l1 m1)
                (* -1 (cos θ) g l1 m2)
                (* -1 (cos φ) g l2 m2))
@@ -37,7 +37,7 @@
                                              (* (((expt D 2) φ) t) (expt l2 2) m2)
                                              (* (sin (φ t)) g l2 m2)))
                                    (simplify (((Lagrange-equations
-                                                 (L-double-pend 'm1 'm2 'l1 'l2 'g))
+                                                 (double/L-double-pend 'm1 'm2 'l1 'l2 'g))
                                                 (up θ φ))
                                                't)))))
-    (is (evolve-double-pendulum 1 9.8 1 0.4 1 0 2 0.6 -1 0))))
+    (is (double/evolver 1 1/60 9.8 1 0.4 1 0 2 0.6 -1 0))))
