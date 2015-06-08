@@ -1,3 +1,4 @@
+
 function rigid_animation($log) {
   var pi = Math.PI;
   var animation, renderer, scene, camera, cube;
@@ -33,6 +34,7 @@ function rigid_animation($log) {
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(45, animation.offsetWidth / animation.offsetHeight, 1, 10000);
     camera.position.set(3,2,2.5);
+    camera.up.set(0,0,1);
     camera.lookAt(origin);
     camera.updateProjectionMatrix();
     $log.debug('camera', camera);
@@ -78,6 +80,7 @@ function rigid_animation($log) {
     // http://www.wolframalpha.com/input/?i=solve+b%5E2%2Bc%5E2%3D1%2C+a%5E2%2Bc%5E2%3DSqrt%5B2%5D%2C+a%5E2%2Bb%5E2%3D2
     var geometry = new THREE.BoxGeometry(1.09868,0.890446,0.455090);
     cube = new THREE.Mesh(geometry, material);
+    cube.matrixAutoUpdate = false;
     scene.add(cube);
     renderer.render(scene, camera);
   }
@@ -104,9 +107,8 @@ function rigid_animation($log) {
     r1.makeRotationZ(datum[2]);
     r2.makeRotationX(datum[1]);
     r3.makeRotationZ(datum[3]);
-    m.multiplyMatrices(r1, r2);
-    m.multiply(r3);
-    cube.rotation.setFromRotationMatrix(m);
+    cube.matrix.multiplyMatrices(r1, r2);
+    cube.matrix.multiply(r3);
     if (datum[4]) {
       var am = datum[4];
       angular_momentum.set(am[0], am[1], am[2]);
@@ -136,14 +138,21 @@ angular.module('Rigid', ['ngMaterial', 'ngSanitize', 'cmServices'])
       templateUrl: '/templates/rigid/value-sliders.html'
     }
   })
+  .factory('EulerAngle', ['$log', function() {
+    // inputs?
+    // ORDER, intrinsic vs. extrinsic
+    // ranges are: 0..2pi, -pi/2 .. pi/2, 0..2pi
+    //
+
+  }])
   .controller('RigidCtrl', ['$scope', '$log', 'parameterManager', 'graphDraw',
     function($scope, $log, parameterManager, graphDraw) {
       var rigid = rigid_animation($log);
       var pi = Math.PI;
       this.parameters = {
-        theta0: {nameHtml: 'θ<sub>0</sub>', min: -pi, max: pi, step: 0.05, default: 0},
-        phi0: {nameHtml: 'φ<sub>0</sub>', min: -pi, max: pi, step: 0.1, default: 0},
-        psi0: {nameHtml: 'ψ<sub>0</sub>', min: -pi, max: pi, step: 0.1, default: 0},
+        theta0: {nameHtml: 'θ<sub>0</sub>', min: -pi/2, max: pi/2, step: 0.05, default: 0},
+        phi0: {nameHtml: 'φ<sub>0</sub>', min: 0, max: 2*pi, step: 0.1, default: 0},
+        psi0: {nameHtml: 'ψ<sub>0</sub>', min: 0, max: 2*pi, step: 0.1, default: 0},
         thetaDot0: {nameHtml: 'θ&prime;<sub>0</sub>', min: -1, max: 1, step: 0.1, default: 0.1},
         phiDot0: {nameHtml: 'φ&prime;<sub>0</sub>', min: -1, max: 1, step: 0.1, default: 0.1},
         psiDot0: {nameHtml: 'ψ&prime;<sub>0</sub>', min: -1, max: 1, step: 0.1, default: 0.1},
