@@ -1,5 +1,5 @@
 angular.module('cmServices', [])
-  .factory('parameterManager', ['$log', '$interval', '$http', function($log, $interval, $http) {
+  .factory('ParameterManager', ['$log', '$interval', '$http', function($log, $interval, $http) {
     var ParameterManager = function(controller, endpoint) {
       this.controller = controller;
       this.parameters = controller.parameters;
@@ -66,7 +66,7 @@ angular.module('cmServices', [])
     };
     return ParameterManager;
   }])
-  .factory('graphDraw', ['$interval', '$log', function($interval, $log) {
+  .factory('GraphDraw', ['$interval', '$log', function($interval, $log) {
     var margin = { left: 40, right: 20, top: 20, bottom: 25 };
     function id(x) { return x; }
     function wrap_pi(angle) {

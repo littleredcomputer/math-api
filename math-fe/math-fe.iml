@@ -35,5 +35,6 @@
     <orderEntry type="library" name="angular-sanitize" level="application" />
     <orderEntry type="library" name="d3" level="application" />
     <orderEntry type="library" name="org.clojure:clojure:1.6.0" level="project" />
+    <orderEntry type="library" name="Leiningen: javax.servlet/javax.servlet-api:3.1.0" level="project" />
   </component>
 </module>
