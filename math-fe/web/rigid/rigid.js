@@ -18,23 +18,21 @@ angular.module('Rigid', ['ngMaterial', 'ngSanitize', 'cmServices'])
     // acquire all of the methods.
     function Axes(len) {
       $log.debug('axes constructor');
-      this.group = new THREE.Group();
       var x = new THREE.Geometry();
       x.vertices.push(origin);
       x.vertices.push(new THREE.Vector3(len,0,0));
-      this.group.add(new THREE.Line(x, new THREE.LineBasicMaterial({color: 0xff0000})));
+      this.add(new THREE.Line(x, new THREE.LineBasicMaterial({color: 0xff0000})));
       var y = new THREE.Geometry();
       y.vertices.push(origin);
       y.vertices.push(new THREE.Vector3(0,len,0));
-      this.group.add(new THREE.Line(y, new THREE.LineBasicMaterial({color: 0x00ff00})));
+      this.add(new THREE.Line(y, new THREE.LineBasicMaterial({color: 0x00ff00})));
       var z = new THREE.Geometry();
       z.vertices.push(origin);
       z.vertices.push(new THREE.Vector3(0,0,len));
-      this.group.add(new THREE.Line(z, new THREE.LineBasicMaterial({color: 0x0000ff})));
+      this.add(new THREE.Line(z, new THREE.LineBasicMaterial({color: 0x0000ff})));
     }
-    Axes.prototype.getGroup = function() {
-      return this.group;
-    };
+    Axes.prototype = new THREE.Group();
+    Axes.constructor = Axes;
     return Axes;
   }])
   .factory('EulerAngles', ['$log', function($log) {
@@ -68,12 +66,14 @@ angular.module('Rigid', ['ngMaterial', 'ngSanitize', 'cmServices'])
         circleGeo.vertices.shift();
         g.circle = new THREE.Line(circleGeo, new THREE.LineBasicMaterial({color: g.color}));
         g.circle.setRotationFromEuler(g.rotation);
-        this.group.add(g.circle);
+        this.add(g.circle);
         var dotGeo = new THREE.SphereGeometry(0.05, 10, 10);
         g.dot = new THREE.Mesh(dotGeo, new THREE.MeshPhongMaterial({color: g.color}));
-        this.group.add(g.dot);
+        this.add(g.dot);
       }
     }
+    EulerAngles.prototype = new THREE.Group();
+    EulerAngles.constructor = EulerAngles;
 
     EulerAngles.prototype.setEulerAngles = function (theta, phi, psi) {
       this.gimbals[0].dot.position.set(this.gimbals[0].radius * Math.cos(psi),
@@ -82,10 +82,6 @@ angular.module('Rigid', ['ngMaterial', 'ngSanitize', 'cmServices'])
         this.gimbals[1].radius * Math.sin(theta));
       this.gimbals[2].dot.position.set(this.gimbals[2].radius * Math.cos(phi),
         this.gimbals[2].radius * Math.sin(phi), 0);
-    };
-
-    EulerAngles.prototype.getGroup = function() {
-      return this.group;
     };
 
     return EulerAngles;
@@ -119,9 +115,9 @@ angular.module('Rigid', ['ngMaterial', 'ngSanitize', 'cmServices'])
       this.scene.add(new THREE.Line(this.L, new THREE.LineBasicMaterial({color: 0xffff00})));
 
       this.euler_angles = new EulerAngles();
-      this.scene.add(this.euler_angles.getGroup());
+      this.scene.add(this.euler_angles);
       var a = new Axes(3);
-      this.scene.add(a.getGroup());
+      this.scene.add(a);
 
       var material = new THREE.MeshPhongMaterial();
       material.opacity = 0.5;
