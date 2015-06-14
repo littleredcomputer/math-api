@@ -168,7 +168,6 @@ angular.module('Rigid', ['ngMaterial', 'ngSanitize', 'cmServices'])
         LAxis.crossVectors(yHat,L);
         LAxis.normalize();
         var angle = yHat.angleTo(L);
-        $log.debug(LAxis, angle);
         this.angularMomentum.matrix.makeRotationAxis(LAxis, angle);
         this.angularMomentum.visible = true;
       }
