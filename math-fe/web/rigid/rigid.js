@@ -41,19 +41,19 @@ angular.module('Rigid', ['ngMaterial', 'ngSanitize', 'cmServices'])
     function EulerAngles() {
       $log.debug('EA constructor');
       this.gimbals = [{
-        radius: 1.2,
+        radius: 1.3,
         color: 0x555588,
         rotation: no_rotation,
         circle: null,
         dot: null
       }, {
-        radius: 1.1,
+        radius: 1.2,
         color: 0x885555,
         rotation: about_y,
         circle: null,
         dot: null
       }, {
-        radius: 1.0,
+        radius: 1.1,
         color: 0x555588,
         rotation: no_rotation,
         circle: null,
@@ -89,7 +89,9 @@ angular.module('Rigid', ['ngMaterial', 'ngSanitize', 'cmServices'])
     var origin = new THREE.Vector3();
     var r1 = new THREE.Matrix4(),
       r2 = new THREE.Matrix4(),
-      r3 = new THREE.Matrix4();
+      r3 = new THREE.Matrix4(),
+      yHat = new THREE.Vector3(0, 1, 0);
+
     function RigidMotion(element_id) {
       var element = document.getElementById(element_id);
       $log.debug('animation container w/h', element.offsetWidth, element.offsetHeight);
@@ -111,11 +113,27 @@ angular.module('Rigid', ['ngMaterial', 'ngSanitize', 'cmServices'])
       var a = new Axes(3);
       this.scene.add(a);
 
-      var cyl = new THREE.CylinderGeometry(0.025, 0.025, 1, 16, 32);
-      this.angularMomentum = new THREE.Mesh(cyl, new THREE.MeshPhongMaterial({color: 0xffff00}));
+      this.angularMomentum = new THREE.Group();
       this.angularMomentum.matrixAutoUpdate = false;
       this.angularMomentum.visible = false;
+
+      var shaft = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.025, 0.025, 1, 16, 32),
+        new THREE.MeshPhongMaterial({color: 0xffff00})
+      ).translateY(0.5);
+      this.angularMomentum.add(shaft);
+      var arrowhead = new THREE.Mesh(
+        new THREE.CylinderGeometry(0, 0.05, 0.1, 16, 16),
+        new THREE.MeshPhongMaterial({color: 0xeeee00})
+      ).translateY(1);
+      this.angularMomentum.add(arrowhead);
       this.scene.add(this.angularMomentum);
+
+      // for debugging
+      //this.Ldot = new THREE.Mesh(
+      //  new THREE.SphereGeometry(0.1, 16, 16),
+      //  new THREE.MeshPhongMaterial({color: 0x883300}));
+      //this.scene.add(Ldot);
 
       var material = new THREE.MeshPhongMaterial();
       material.opacity = 0.5;
@@ -129,9 +147,7 @@ angular.module('Rigid', ['ngMaterial', 'ngSanitize', 'cmServices'])
     }
 
     // scratch storage
-    var yHat = new THREE.Vector3(0, 1, 0);
     var L = new THREE.Vector3();
-    var halfL = new THREE.Vector3();
     var LAxis = new THREE.Vector3();
 
     RigidMotion.prototype.setEulerAngles = function(datum) {
@@ -148,12 +164,12 @@ angular.module('Rigid', ['ngMaterial', 'ngSanitize', 'cmServices'])
         var am = datum[4];
         L.set(am[0], am[1], am[2]);
         L.normalize();
+        // this.Ldot.position.copy(L);
         LAxis.crossVectors(yHat,L);
+        LAxis.normalize();
         var angle = yHat.angleTo(L);
-        halfL.copy(L);
-        halfL.multiplyScalar(0.5);
+        $log.debug(LAxis, angle);
         this.angularMomentum.matrix.makeRotationAxis(LAxis, angle);
-        this.angularMomentum.matrix.setPosition(halfL);
         this.angularMomentum.visible = true;
       }
       this.render();
