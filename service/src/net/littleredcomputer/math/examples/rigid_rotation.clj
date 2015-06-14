@@ -4,7 +4,6 @@
             [math.mechanics.rigid :refer :all]
             [clojure.tools.logging :as log]))
 
-
 (defn evolver
   [t dt A B C θ0 φ0 ψ0 θdot0 φdot0 ψdot0]
   (let [state-history (atom [])

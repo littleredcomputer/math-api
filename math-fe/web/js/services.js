@@ -3,11 +3,11 @@ angular.module('cmServices', [])
     var ParameterManager = function(controller, endpoint) {
       this.controller = controller;
       this.parameters = controller.parameters;
+      angular.forEach(this.parameters, function(v) {
+        v.default = v.value;
+      }, this);
       this.endpoint = endpoint;
       this.interval = undefined;
-      angular.forEach(this.parameters, function(value) {
-        value.value = value.default;
-      });
     };
 
     ParameterManager.prototype.watch = function($scope, action) {
@@ -22,16 +22,17 @@ angular.module('cmServices', [])
     };
 
     ParameterManager.prototype.set = function(ps) {
-      angular.forEach(this.parameters, function(value, key) {
-        if (ps[key] !== undefined) {
-          value.value = ps[key];
+      angular.forEach(this.parameters, function(v, k) {
+        if (ps[k] !== undefined) {
+          v.value = ps[k];
         } else {
-          value.value = value.default;
+          v.value = v.default;
         }
-      });
+      }, this);
     };
-
-    ParameterManager.prototype.fetch = function(extra_params, action) {
+    // Arguably this doesn't belong here.
+    ParameterManager.prototype.fetchAnimation = function(extra_params, action) {
+      if (!this.endpoint) return;
       var self = this;
       if (this.interval) {
         $log.debug('cancelling interval');

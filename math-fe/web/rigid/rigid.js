@@ -14,8 +14,6 @@ angular.module('Rigid', ['ngMaterial', 'ngSanitize', 'cmServices'])
   .factory('Axes', ['$log', function($log) {
     $log.debug('axes factory');
     var origin = new THREE.Vector3();
-    // perhaps Axes should be a subclass of Group. Then it would
-    // acquire all of the methods.
     function Axes(len) {
       $log.debug('axes constructor');
       var x = new THREE.Geometry();
@@ -38,28 +36,29 @@ angular.module('Rigid', ['ngMaterial', 'ngSanitize', 'cmServices'])
   .factory('EulerAngles', ['$log', function($log) {
     $log.debug('EA factory');
     var pi = Math.PI;
+    var no_rotation = new THREE.Euler(0, 0, 0);
+    var about_y = new THREE.Euler(0, pi/2, 0);
     function EulerAngles() {
       $log.debug('EA constructor');
       this.gimbals = [{
         radius: 1.2,
         color: 0x555588,
-        rotation: new THREE.Euler(0, 0, 0),
+        rotation: no_rotation,
         circle: null,
         dot: null
       }, {
         radius: 1.1,
         color: 0x885555,
-        rotation: new THREE.Euler(0, pi / 2, 0),
+        rotation: about_y,
         circle: null,
         dot: null
       }, {
         radius: 1.0,
         color: 0x555588,
-        rotation: new THREE.Euler(0, 0, 0),
+        rotation: no_rotation,
         circle: null,
         dot: null
       }];
-      this.group = new THREE.Group();
       for (var i = 0; i < this.gimbals.length; ++i) {
         var g = this.gimbals[i];
         var circleGeo = new THREE.CircleGeometry(g.radius, 50, 0, 2 * pi);
@@ -103,21 +102,20 @@ angular.module('Rigid', ['ngMaterial', 'ngSanitize', 'cmServices'])
       this.camera.up.set(0,0,1);
       this.camera.lookAt(origin);
       this.camera.updateProjectionMatrix();
-      this.scene.add(this.camera); // XXX check if this is needed.
       var light = new THREE.DirectionalLight(0xffffff, 1.5);
       light.position.set(6,6,0);
       this.scene.add(light);
-
-      this.angular_momentum = new THREE.Vector3();
-      this.L = new THREE.Geometry();
-      this.L.vertices.push(origin);
-      this.L.vertices.push(this.angular_momentum);
-      this.scene.add(new THREE.Line(this.L, new THREE.LineBasicMaterial({color: 0xffff00})));
 
       this.euler_angles = new EulerAngles();
       this.scene.add(this.euler_angles);
       var a = new Axes(3);
       this.scene.add(a);
+
+      var cyl = new THREE.CylinderGeometry(0.025, 0.025, 1, 16, 32);
+      this.angularMomentum = new THREE.Mesh(cyl, new THREE.MeshPhongMaterial({color: 0xffff00}));
+      this.angularMomentum.matrixAutoUpdate = false;
+      this.angularMomentum.visible = false;
+      this.scene.add(this.angularMomentum);
 
       var material = new THREE.MeshPhongMaterial();
       material.opacity = 0.5;
@@ -128,8 +126,13 @@ angular.module('Rigid', ['ngMaterial', 'ngSanitize', 'cmServices'])
       this.cube = new THREE.Mesh(geometry, material);
       this.cube.matrixAutoUpdate = false;
       this.scene.add(this.cube);
-      this.render();
     }
+
+    // scratch storage
+    var yHat = new THREE.Vector3(0, 1, 0);
+    var L = new THREE.Vector3();
+    var halfL = new THREE.Vector3();
+    var LAxis = new THREE.Vector3();
 
     RigidMotion.prototype.setEulerAngles = function(datum) {
       var theta = datum[1], phi = datum[2], psi = datum[3];
@@ -143,15 +146,20 @@ angular.module('Rigid', ['ngMaterial', 'ngSanitize', 'cmServices'])
       this.cube.matrix.multiply(r3);
       if (datum[4]) {
         var am = datum[4];
-        this.angular_momentum.set(am[0], am[1], am[2]);
-        this.angular_momentum.normalize();
-        // this is said to be expensive, but what else to do?
-        this.L.verticesNeedUpdate = true;
+        L.set(am[0], am[1], am[2]);
+        L.normalize();
+        LAxis.crossVectors(yHat,L);
+        var angle = yHat.angleTo(L);
+        halfL.copy(L);
+        halfL.multiplyScalar(0.5);
+        this.angularMomentum.matrix.makeRotationAxis(LAxis, angle);
+        this.angularMomentum.matrix.setPosition(halfL);
+        this.angularMomentum.visible = true;
       }
       this.render();
     };
 
-    RigidMotion.prototype.render = function() { // wut -- do we need this
+    RigidMotion.prototype.render = function() {
       this.renderer.render(this.scene, this.camera);
     };
 
@@ -162,13 +170,13 @@ angular.module('Rigid', ['ngMaterial', 'ngSanitize', 'cmServices'])
       var rigid;
       var pi = Math.PI;
       this.parameters = {
-        theta0: {nameHtml: 'θ<sub>0</sub>', min: -pi/2, max: pi/2, step: 0.05, default: 0},
-        phi0: {nameHtml: 'φ<sub>0</sub>', min: 0, max: 2*pi, step: 0.1, default: 0},
-        psi0: {nameHtml: 'ψ<sub>0</sub>', min: 0, max: 2*pi, step: 0.1, default: 0},
-        thetaDot0: {nameHtml: 'θ&prime;<sub>0</sub>', min: -1, max: 1, step: 0.1, default: 0.1},
-        phiDot0: {nameHtml: 'φ&prime;<sub>0</sub>', min: -1, max: 1, step: 0.1, default: 0.1},
-        psiDot0: {nameHtml: 'ψ&prime;<sub>0</sub>', min: -1, max: 1, step: 0.1, default: 0.1},
-        t: {nameHtml: 't', min: 1, max: 100, step: 2, default: 25}
+        theta0: {nameHtml: 'θ<sub>0</sub>', min: -pi/2, max: pi/2, step: 0.05, value: 0},
+        phi0: {nameHtml: 'φ<sub>0</sub>', min: 0, max: 2*pi, step: 0.1, value: 0},
+        psi0: {nameHtml: 'ψ<sub>0</sub>', min: 0, max: 2*pi, step: 0.1, value: 0},
+        thetaDot0: {nameHtml: 'θ&prime;<sub>0</sub>', min: -1, max: 1, step: 0.1, value: 0.1},
+        phiDot0: {nameHtml: 'φ&prime;<sub>0</sub>', min: -1, max: 1, step: 0.1, value: 0.1},
+        psiDot0: {nameHtml: 'ψ&prime;<sub>0</sub>', min: -1, max: 1, step: 0.1, value: 0.1},
+        t: {nameHtml: 't', min: 1, max: 100, step: 2, value: 25}
       };
       var pm = new ParameterManager(this, '/api/sicm/rigid/evolve');
       var graph = new GraphDraw({
@@ -194,9 +202,26 @@ angular.module('Rigid', ['ngMaterial', 'ngSanitize', 'cmServices'])
       this.go = function() {
         var dt = this.parameters.t.value/500;
         console.log('dt computed as ', dt, 't', this.parameters.t.value);
-        pm.fetch({dt: dt, A: 1, B: Math.sqrt(2), C: 2}, function(data, url_params) {
+        pm.fetchAnimation({dt: dt, A: 1, B: Math.sqrt(2), C: 2}, function(data, url_params) {
           graph.draw(data, 0, url_params.t);
           return graph.animate(data, url_params.dt, rigid.setEulerAngles.bind(rigid));
+        })
+      }
+    }])
+  .controller('EulerCtrl', ['$scope', '$log', 'ParameterManager', 'RigidMotion',
+    function($scope, $log, ParameterManager, RigidMotion) {
+      var rigid;
+      var pi = Math.PI;
+      this.parameters = {
+        theta: {nameHtml: 'θ', min: -pi/2, max: pi/2, step: 0.05, value: 0},
+        phi: {nameHtml: 'φ', min: 0, max: 2*pi, step: 0.1, value: 0},
+        psi: {nameHtml: 'ψ', min: 0, max: 2*pi, step: 0.1, value: 0}
+      };
+      var pm = new ParameterManager(this);
+      this.init = function() {
+        rigid = new RigidMotion();
+        pm.watch($scope, function(parameters) {
+          rigid.setEulerAngles([0, parameters.theta.value, parameters.phi.value, parameters.psi.value])
         })
       }
     }]);
