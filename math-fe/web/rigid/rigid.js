@@ -86,19 +86,22 @@ angular.module('Rigid', ['ngMaterial', 'ngSanitize', 'cmServices'])
     return EulerAngles;
   }])
   .factory('Arrow', ['$log', function($log) {
+    // A unit-length arrow, initially invisible, formed from a cylinder and a
+    // cone. Use pointToward to make the arrow appear and point in the direction
+    // (x,y,z) starting from the origin.
     var direction = new THREE.Vector3();
     var axis = new THREE.Vector3();
     var yHat = new THREE.Vector3(0, 1, 0);
     $log.debug('arrow factory');
     function Arrow() {
-      $log.debug('arrow ctor');
+      $log.debug('arrow constructor');
       this.add(new THREE.Mesh(
         new THREE.CylinderGeometry(0.025, 0.025, 1, 16, 32),
         new THREE.MeshPhongMaterial({color: 0xffff00})
       ).translateY(0.5));
       this.add(new THREE.Mesh(
         new THREE.CylinderGeometry(0, 0.05, 0.1, 16, 16),
-        new THREE.MeshPhongMaterial({color: 0xeeee00})
+        new THREE.MeshPhongMaterial({color: 0xffff00})
       ).translateY(1));
       this.visible = false;
     }
@@ -135,8 +138,11 @@ angular.module('Rigid', ['ngMaterial', 'ngSanitize', 'cmServices'])
       this.camera.lookAt(origin);
       this.camera.updateProjectionMatrix();
       var light = new THREE.DirectionalLight(0xffffff, 1.5);
-      light.position.set(6,6,0);
+      light.position.set(0,0,6);
       this.scene.add(light);
+      var light2 = new THREE.DirectionalLight(0xaaaaaa, 0.75);
+      light2.position.set(6,6,-2);
+      this.scene.add(light2);
 
       this.euler_angles = new EulerAngles();
       this.scene.add(this.euler_angles);
@@ -154,7 +160,7 @@ angular.module('Rigid', ['ngMaterial', 'ngSanitize', 'cmServices'])
       //this.scene.add(Ldot);
 
       var material = new THREE.MeshPhongMaterial();
-      material.opacity = 0.5;
+      material.opacity = 0.75;
       material.transparent = true;
 
       // http://www.wolframalpha.com/input/?i=solve+b%5E2%2Bc%5E2%3D1%2C+a%5E2%2Bc%5E2%3DSqrt%5B2%5D%2C+a%5E2%2Bb%5E2%3D2
@@ -168,7 +174,6 @@ angular.module('Rigid', ['ngMaterial', 'ngSanitize', 'cmServices'])
       var theta = datum[1], phi = datum[2], psi = datum[3];
       this.euler_angles.setEulerAngles(theta, phi, psi);
       // convert from ZXZ euler angles to rotation matrix
-      // (sigh)
       r1.makeRotationZ(phi);
       r2.makeRotationX(theta);
       r3.makeRotationZ(psi);
