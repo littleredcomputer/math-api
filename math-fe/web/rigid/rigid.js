@@ -85,12 +85,42 @@ angular.module('Rigid', ['ngMaterial', 'ngSanitize', 'cmServices'])
 
     return EulerAngles;
   }])
-  .factory('RigidMotion', ['$log', 'Axes', 'EulerAngles', function($log, Axes, EulerAngles) {
+  .factory('Arrow', ['$log', function($log) {
+    var direction = new THREE.Vector3();
+    var axis = new THREE.Vector3();
+    var yHat = new THREE.Vector3(0, 1, 0);
+    $log.debug('arrow factory');
+    function Arrow() {
+      $log.debug('arrow ctor');
+      this.add(new THREE.Mesh(
+        new THREE.CylinderGeometry(0.025, 0.025, 1, 16, 32),
+        new THREE.MeshPhongMaterial({color: 0xffff00})
+      ).translateY(0.5));
+      this.add(new THREE.Mesh(
+        new THREE.CylinderGeometry(0, 0.05, 0.1, 16, 16),
+        new THREE.MeshPhongMaterial({color: 0xeeee00})
+      ).translateY(1));
+      this.visible = false;
+    }
+    Arrow.prototype = new THREE.Group();
+    Arrow.constructor = Arrow;
+    Arrow.prototype.pointToward = function(x, y, z) {
+      direction.set(x, y, z);
+      direction.normalize();
+      // XXX what if yHat and direction are parallel, or antiparallel?
+      axis.crossVectors(yHat,direction);
+      axis.normalize();
+      var angle = yHat.angleTo(direction);
+      this.matrix.makeRotationAxis(axis, angle);
+      this.visible = true;
+    };
+    return Arrow;
+  }])
+  .factory('RigidMotion', ['$log', 'Axes', 'Arrow', 'EulerAngles', function($log, Axes, Arrow, EulerAngles) {
     var origin = new THREE.Vector3();
     var r1 = new THREE.Matrix4(),
       r2 = new THREE.Matrix4(),
-      r3 = new THREE.Matrix4(),
-      yHat = new THREE.Vector3(0, 1, 0);
+      r3 = new THREE.Matrix4();
 
     function RigidMotion(element_id) {
       var element = document.getElementById(element_id);
@@ -113,20 +143,8 @@ angular.module('Rigid', ['ngMaterial', 'ngSanitize', 'cmServices'])
       var a = new Axes(3);
       this.scene.add(a);
 
-      this.angularMomentum = new THREE.Group();
+      this.angularMomentum = new Arrow();
       this.angularMomentum.matrixAutoUpdate = false;
-      this.angularMomentum.visible = false;
-
-      var shaft = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.025, 0.025, 1, 16, 32),
-        new THREE.MeshPhongMaterial({color: 0xffff00})
-      ).translateY(0.5);
-      this.angularMomentum.add(shaft);
-      var arrowhead = new THREE.Mesh(
-        new THREE.CylinderGeometry(0, 0.05, 0.1, 16, 16),
-        new THREE.MeshPhongMaterial({color: 0xeeee00})
-      ).translateY(1);
-      this.angularMomentum.add(arrowhead);
       this.scene.add(this.angularMomentum);
 
       // for debugging
@@ -146,10 +164,6 @@ angular.module('Rigid', ['ngMaterial', 'ngSanitize', 'cmServices'])
       this.scene.add(this.cube);
     }
 
-    // scratch storage
-    var L = new THREE.Vector3();
-    var LAxis = new THREE.Vector3();
-
     RigidMotion.prototype.setEulerAngles = function(datum) {
       var theta = datum[1], phi = datum[2], psi = datum[3];
       this.euler_angles.setEulerAngles(theta, phi, psi);
@@ -162,14 +176,7 @@ angular.module('Rigid', ['ngMaterial', 'ngSanitize', 'cmServices'])
       this.cube.matrix.multiply(r3);
       if (datum[4]) {
         var am = datum[4];
-        L.set(am[0], am[1], am[2]);
-        L.normalize();
-        // this.Ldot.position.copy(L);
-        LAxis.crossVectors(yHat,L);
-        LAxis.normalize();
-        var angle = yHat.angleTo(L);
-        this.angularMomentum.matrix.makeRotationAxis(LAxis, angle);
-        this.angularMomentum.visible = true;
+        this.angularMomentum.pointToward(am[0], am[1], am[2]);
       }
       this.render();
     };
