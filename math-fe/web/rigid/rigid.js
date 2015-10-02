@@ -13,21 +13,24 @@ angular.module('Rigid', ['ngMaterial', 'ngSanitize', 'cmServices'])
   })
   .factory('Axes', ['$log', function($log) {
     $log.debug('axes factory');
-    var origin = new THREE.Vector3();
+    var pi = Math.PI;
+    var axes = [
+      {color: 0xff0000, rot: function(a) {return a.rotateZ(-pi/2);}},
+      {color: 0x00ff00, rot: function(a) {return a;}},
+      {color: 0x0000ff, rot: function(a) {return a.rotateX(pi/2);}}
+    ];
     function Axes(len) {
       $log.debug('axes constructor');
-      var x = new THREE.Geometry();
-      x.vertices.push(origin);
-      x.vertices.push(new THREE.Vector3(len,0,0));
-      this.add(new THREE.Line(x, new THREE.LineBasicMaterial({color: 0xff0000})));
-      var y = new THREE.Geometry();
-      y.vertices.push(origin);
-      y.vertices.push(new THREE.Vector3(0,len,0));
-      this.add(new THREE.Line(y, new THREE.LineBasicMaterial({color: 0x00ff00})));
-      var z = new THREE.Geometry();
-      z.vertices.push(origin);
-      z.vertices.push(new THREE.Vector3(0,0,len));
-      this.add(new THREE.Line(z, new THREE.LineBasicMaterial({color: 0x0000ff})));
+      var yScale = new THREE.Vector3(1, len, 1);
+      for (var a in axes) {
+        var axis = axes[a];
+        var ax = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.01, 0.01, 1, 16, 32),
+          new THREE.MeshPhongMaterial({color: axis.color})
+        );
+        ax.scale.copy(yScale);
+        this.add(axis.rot(ax).translateY(len/2));
+      }
     }
     Axes.prototype = new THREE.Group();
     Axes.constructor = Axes;
@@ -115,6 +118,7 @@ angular.module('Rigid', ['ngMaterial', 'ngSanitize', 'cmServices'])
       axis.normalize();
       var angle = yHat.angleTo(direction);
       this.matrix.makeRotationAxis(axis, angle);
+      this.matrixAutoUpdate = false;
       this.visible = true;
     };
     return Arrow;
@@ -146,11 +150,10 @@ angular.module('Rigid', ['ngMaterial', 'ngSanitize', 'cmServices'])
 
       this.euler_angles = new EulerAngles();
       this.scene.add(this.euler_angles);
-      var a = new Axes(3);
+      var a = new Axes(4);
       this.scene.add(a);
 
       this.angularMomentum = new Arrow();
-      this.angularMomentum.matrixAutoUpdate = false;
       this.scene.add(this.angularMomentum);
 
       // for debugging

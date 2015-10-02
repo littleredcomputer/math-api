@@ -11,7 +11,8 @@
             [net.littleredcomputer.math.examples
              [driven-pendulum :as driven]
              [double-pendulum :as double]
-             [rigid-rotation :as rigid]]
+             [rigid-rotation :as rigid]
+             [central-potential :as central]]
             [clojure.tools.logging :as log])
   (:gen-class :extends javax.servlet.http.HttpServlet))
 
@@ -36,16 +37,12 @@
   sicm
   (sicm-get "/api/sicm/pendulum/driven/evolve" driven/evolver
             [:t :dt :A :omega :g :theta0 :thetaDot0])
-  ;(GET "/api/sicm/pendulum/driven/equations" []
-  ;  (-> driven/equations (pp/write :stream nil) response text-plain))
   (sicm-get "/api/sicm/pendulum/double/evolve" double/evolver
             [:t :dt :g :m1 :l1 :theta0 :thetaDot0 :m2 :l2 :phi0 :phiDot0])
-  ;(GET "/api/sicm/pendulum/double/equations" []
-  ;  (-> double/equations (pp/write :stream nil) response text-plain))
   (sicm-get "/api/sicm/rigid/evolve" rigid/evolver
             [:t :dt :A :B :C :theta0 :phi0 :psi0 :thetaDot0 :phiDot0 :psiDot0])
-  ;(GET "/api/sicm/rigid/equations" []
-  ;  (-> rigid/equations (pp/write :stream nil) response text-plain))
+  (sicm-get "/api/sicm/gravity/evolve" central/evolver
+            [:t :dt :M :x0 :y0 :xDot0 :yDot0])
   (GET "/api/sicm/version" []
     (-> "1.0" response text-plain)))
 
