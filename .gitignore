@@ -2,8 +2,6 @@
 .DS_Store
 out/
 target/
-.idea/workspace.xml
-.idea/replstate.xml
-.idea/tasks.xml
+.idea/
 .lein-failures
 .lein-repl-history
