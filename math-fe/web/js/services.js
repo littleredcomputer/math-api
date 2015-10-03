@@ -47,7 +47,7 @@ angular.module('cmServices', [])
       $log.debug('busy', self.controller.busy);
       $http.get(this.endpoint, {params: url_params})
         .success(function(data) {
-          self.interval = action(data, url_params);
+          self.interval = action(data, self.parameters);
           self.interval.then(function() {
             $log.debug('interval complete');
             self.interval = undefined;

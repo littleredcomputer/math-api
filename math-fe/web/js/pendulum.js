@@ -77,28 +77,29 @@ function double_pendulum() {
   }
 
   function diagram(parameters) {
-    var l1 = parameters.l1.value,
-      l2 = 1 - l1,
-      m1 = parameters.m1.value,
-      m2 = 1 - m1,
-      xa = l1 * Math.sin(parameters.theta0.value),
-      xA = dx_scale(xa),
-      ya = - l1 * Math.cos(parameters.theta0.value),
-      yA = dy_scale(ya),
-      xB = dx_scale(xa + l2 * Math.sin(parameters.phi0.value)),
-      yB = dy_scale(ya - l2 * Math.cos(parameters.phi0.value));
-
-    strut1.attr('x2', xA).attr('y2', yA);
-    strut2.attr('x1', xA).attr('y1', yA).attr('x2', xB).attr('y2', yB);
-    bob1.attr('cx', xA).attr('cy', yA).attr('r', m_scale(m1));
-    bob2.attr('cx', xB).attr('cy', yB).attr('r', m_scale(m2));
+    //var l1 = parameters.l1.value,
+    //  l2 = 1 - l1,
+    //  m1 = parameters.m1.value,
+    //  m2 = 1 - m1,
+    //  xa = l1 * Math.sin(parameters.theta0.value),
+    //  xA = dx_scale(xa),
+    //  ya = - l1 * Math.cos(parameters.theta0.value),
+    //  yA = dy_scale(ya),
+    //  xB = dx_scale(xa + l2 * Math.sin(parameters.phi0.value)),
+    //  yB = dy_scale(ya - l2 * Math.cos(parameters.phi0.value));
+    //
+    //strut1.attr('x2', xA).attr('y2', yA);
+    //strut2.attr('x1', xA).attr('y1', yA).attr('x2', xB).attr('y2', yB);
+    //bob1.attr('cx', xA).attr('cy', yA).attr('r', m_scale(m1));
+    //bob2.attr('cx', xB).attr('cy', yB).attr('r', m_scale(m2));
+    animate([0, parameters.theta0.value, parameters.phi0.value], parameters);
   }
 
   function animate(datum, parameters) {
-    var l1 = parameters['l1'];
-    var l2 = parameters['l2'];
-    var m1 = parameters['m1'];
-    var m2 = parameters['m2'];
+    var l1 = parameters.l1.value;
+    var l2 = 1-l1;
+    var m1 = parameters.m1.value;
+    var m2 = 1-m1;
     var xa = l1 * Math.sin(datum[1]),
       xA = dx_scale(xa),
       ya = -l1 * Math.cos(datum[1]),
@@ -172,10 +173,11 @@ angular.module('Pendulum', ['ngMaterial', 'ngSanitize', 'cmServices'])
       };
       this.set = pm.set;
       this.go = function() {
-        pm.fetchAnimation({dt: 1/60}, function(data, url_params) {
+        var dt = 1/60;
+        pm.fetchAnimation({dt: dt}, function(data, parameters) {
           dp.setup();
-          graph.draw(data, 0, url_params.t);
-          return graph.animate(data, url_params.dt, dp.animate);
+          graph.draw(data, 0, parameters.t.value);
+          return graph.animate(data, dt, dp.animate);
         });
       };
     }])
@@ -210,14 +212,16 @@ angular.module('Pendulum', ['ngMaterial', 'ngSanitize', 'cmServices'])
       };
       this.set = pm.set;
       this.go = function() {
+        var dt = 1/60;
         pm.fetchAnimation({
-          dt: 1 / 60,
+          dt: dt,
           l2: 1 - this.parameters.l1.value,
           m2: 1 - this.parameters.m1.value
-        }, function(data, url_params) {
+        }, function(data, parameters) {
           dp.setup();
-          graph.draw(data, 0, url_params.t);
-          return graph.animate(data, url_params.dt, function(datum) { dp.animate(datum, url_params); });
+          console.log('p', parameters);
+          graph.draw(data, 0, parameters.t.value);
+          return graph.animate(data, dt, function(datum) { dp.animate(datum, parameters); });
         });
       };
     }]);

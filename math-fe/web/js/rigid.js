@@ -22,15 +22,14 @@ angular.module('Rigid', ['ngMaterial', 'ngSanitize', 'cmServices'])
     function Axes(len) {
       $log.debug('axes constructor');
       var yScale = new THREE.Vector3(1, len, 1);
-      for (var a in axes) {
-        var axis = axes[a];
+      angular.forEach(axes, function(axis) {
         var ax = new THREE.Mesh(
           new THREE.CylinderGeometry(0.01, 0.01, 1, 16, 32),
           new THREE.MeshPhongMaterial({color: axis.color})
         );
         ax.scale.copy(yScale);
         this.add(axis.rot(ax).translateY(len/2));
-      }
+      }, this);
     }
     Axes.prototype = new THREE.Group();
     Axes.constructor = Axes;
@@ -230,11 +229,11 @@ angular.module('Rigid', ['ngMaterial', 'ngSanitize', 'cmServices'])
       };
       this.set = pm.set;
       this.go = function() {
-        var dt = this.parameters.t.value/500;
+        var dt = 1/60;
         console.log('dt computed as ', dt, 't', this.parameters.t.value);
-        pm.fetchAnimation({dt: dt, A: 1, B: Math.sqrt(2), C: 2}, function(data, url_params) {
-          graph.draw(data, 0, url_params.t);
-          return graph.animate(data, url_params.dt, rigid.setEulerAngles.bind(rigid));
+        pm.fetchAnimation({dt: dt, A: 1, B: Math.sqrt(2), C: 2}, function(data, parameters) {
+          graph.draw(data, 0, parameters.t.value);
+          return graph.animate(data, dt, rigid.setEulerAngles.bind(rigid));
         })
       }
     }])
