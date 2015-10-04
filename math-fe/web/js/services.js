@@ -163,7 +163,7 @@ angular.module('cmServices', [])
       var t0 = new Date();
       var timer = $interval(function() {
         animate_step();
-      }, 1000 * this.dt, data.length, false);
+      }, 1000 * this.dt, data.length);
       timer.then(function() {
         var ms = new Date() - t0;
         $log.debug(data.length, 'points in', ms, 'msec', 1000 * data.length/ms, 'Hz');

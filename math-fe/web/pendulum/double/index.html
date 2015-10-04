@@ -13,14 +13,14 @@
 <md-progress-linear class="divider" md-mode="indeterminate" ng-show="pend.busy"></md-progress-linear>
 <div layout="row" flex>
   <div layout="column" flex=66 class="presentation">
-    <double-pendulum-animation flex id="pendulum-animation" class="animation-container" ng-init="pend.init();"></double-pendulum-animation>
+    <double-pendulum-animation flex id="pendulum-animation" class="animation-container"></double-pendulum-animation>
     <div layout flex id="pendulum-graph" class="graph-container"></div>
   </div>
   <div layout="column" flex=33>
     <div class="cm-documentation">
       Here is some documentation and some example links.<br/>
-      <a ng-click="pend.set({theta0:3.1416,phi0:3.1416}); pend.go();" href>almost vertical</a>,
-      <a ng-click="pend.set({theta0:1.5708,phi0:1.5708,l1:0.8,m1:0.8}); pend.go();" href>little satellite</a>
+      <a ng-click="pend.set({theta:3.1416,phi:3.1416}); pend.go();" href>almost vertical</a>,
+      <a ng-click="pend.set({theta:1.5708,phi:1.5708,l1:0.8,m1:0.8}); pend.go();" href>little satellite</a>
     </div>
     <value-sliders ></value-sliders>
     <div layout="row" layout-align="space-around center">

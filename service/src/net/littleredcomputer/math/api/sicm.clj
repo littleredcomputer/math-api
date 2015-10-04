@@ -36,11 +36,11 @@
 (defroutes
   sicm
   (sicm-get "/api/sicm/pendulum/driven/evolve" driven/evolver
-            [:t :dt :A :omega :g :theta0 :thetaDot0])
+            [:t :dt :A :omega :g :theta :thetaDot])
   (sicm-get "/api/sicm/pendulum/double/evolve" double/evolver
-            [:t :dt :g :m1 :l1 :theta0 :thetaDot0 :m2 :l2 :phi0 :phiDot0])
+            [:t :dt :g :m1 :l1 :theta :thetaDot :m2 :l2 :phi :phiDot])
   (sicm-get "/api/sicm/rigid/evolve" rigid/evolver
-            [:t :dt :A :B :C :theta0 :phi0 :psi0 :thetaDot0 :phiDot0 :psiDot0])
+            [:t :dt :A :B :C :theta :phi :psi :thetaDot :phiDot :psiDot])
   (sicm-get "/api/sicm/gravity/evolve" central/evolver
             [:t :dt :M :x0 :y0 :xDot0 :yDot0])
   (GET "/api/sicm/version" []

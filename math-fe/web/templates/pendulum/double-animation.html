@@ -1,10 +1,12 @@
-<svg>
+<svg viewBox="-1.2 -1.2 2.4 2.4">
   <g id="pendulum-frame">
-    <text x="5" y="15">t={{pend.t | number:2}}</text>
-    <line id="strut1" class="pendulum-strut"></line>
-    <line id="strut2" class="pendulum-strut"></line>
-    <circle id="pivot" class="pendulum-pivot" r="4"></circle>
-    <circle id="bob1" class="pendulum-bob theta" r="8"></circle>
-    <circle id="bob2" class="pendulum-bob phi" r="8"></circle>
+    <text x="-1" y="-1" font-size="0.1">t={{pend.t | number:2}}</text>
+    <line id="strut1" class="pendulum-strut" x1="0" y1="0" ng-attr-x2="{{pend.x1()}}" ng-attr-y2="{{pend.y1()}}" ></line>
+    <line id="strut2" class="pendulum-strut"
+          ng-attr-x1="{{pend.x1()}}" ng-attr-y1="{{pend.y1()}}"
+          ng-attr-x2="{{pend.x2()}}" ng-attr-y2="{{pend.y2()}}"></line>
+    <circle id="pivot" class="pendulum-pivot" cx="0" cy="0" r="0.02"></circle>
+    <circle id="bob1" class="pendulum-bob theta" ng-attr-cx="{{pend.x1()}}" ng-attr-cy="{{pend.y1()}}" ng-attr-r="{{pend.m1r()}}"></circle>
+    <circle id="bob2" class="pendulum-bob phi" ng-attr-cx="{{pend.x2()}}" ng-attr-cy="{{pend.y2()}}" ng-attr-r="{{pend.m2r()}}"></circle>
   </g>
 </svg>

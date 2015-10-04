@@ -19,9 +19,9 @@ function gravity() {
   }
 
   function diagram(parameters) {
-    var xa = Math.sin(parameters.theta0.value),
+    var xa = Math.sin(parameters.theta.value),
       xA = dx_scale(xa),
-      ya = - Math.cos(parameters.theta0.value),
+      ya = - Math.cos(parameters.theta.value),
       yA = dy_scale(ya);
 
     //strut.attr('x2', xA).attr('y2', yA);
@@ -65,8 +65,8 @@ angular.module('Gravity', ['ngMaterial', 'ngSanitize', 'cmServices'])
 
       this.busy = 0;
       this.parameters = {
-        theta0: {nameHtml: 'θ<sub>0</sub>', min: -3.1416, max: 3.1416, step: 0.1, value: 1},
-        thetaDot0: {nameHtml: 'θ&prime;<sub>0</sub>', min: -3, max: 3, step: 0.1, value: 0},
+        theta: {nameHtml: 'θ<sub>0</sub>', min: -3.1416, max: 3.1416, step: 0.1, value: 1},
+        thetaDot: {nameHtml: 'θ&prime;<sub>0</sub>', min: -3, max: 3, step: 0.1, value: 0},
         omega: {nameHtml: 'ω', min: 0, max: 50, step: 0.1, value: 2*Math.sqrt(9.8)},
         g: {nameHtml: 'g', min: -2, max: 15, step: 0.1, value: 9.8},
         A: {nameHtml: 'A', min: 0, max: 0.3, step: 0.05, value: 0.1},

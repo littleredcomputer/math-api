@@ -199,12 +199,12 @@ angular.module('Rigid', ['ngMaterial', 'ngSanitize', 'cmServices'])
       var rigid;
       var pi = Math.PI;
       this.parameters = {
-        theta0: {nameHtml: 'θ<sub>0</sub>', min: -pi/2, max: pi/2, step: 0.05, value: 0},
-        phi0: {nameHtml: 'φ<sub>0</sub>', min: 0, max: 2*pi, step: 0.1, value: 0},
-        psi0: {nameHtml: 'ψ<sub>0</sub>', min: 0, max: 2*pi, step: 0.1, value: 0},
-        thetaDot0: {nameHtml: 'θ&prime;<sub>0</sub>', min: -1, max: 1, step: 0.1, value: 0.1},
-        phiDot0: {nameHtml: 'φ&prime;<sub>0</sub>', min: -1, max: 1, step: 0.1, value: 0.1},
-        psiDot0: {nameHtml: 'ψ&prime;<sub>0</sub>', min: -1, max: 1, step: 0.1, value: 0.1},
+        theta: {nameHtml: 'θ<sub>0</sub>', min: -pi/2, max: pi/2, step: 0.05, value: 0},
+        phi: {nameHtml: 'φ<sub>0</sub>', min: 0, max: 2*pi, step: 0.1, value: 0},
+        psi: {nameHtml: 'ψ<sub>0</sub>', min: 0, max: 2*pi, step: 0.1, value: 0},
+        thetaDot: {nameHtml: 'θ&prime;<sub>0</sub>', min: -1, max: 1, step: 0.1, value: 0.1},
+        phiDot: {nameHtml: 'φ&prime;<sub>0</sub>', min: -1, max: 1, step: 0.1, value: 0.1},
+        psiDot: {nameHtml: 'ψ&prime;<sub>0</sub>', min: -1, max: 1, step: 0.1, value: 0.1},
         t: {nameHtml: 't', min: 1, max: 100, step: 2, value: 25}
       };
       var pm = new ParameterManager(this.parameters);
@@ -225,7 +225,7 @@ angular.module('Rigid', ['ngMaterial', 'ngSanitize', 'cmServices'])
       this.init = function() {
         rigid = new RigidMotion('rigid-animation');
         pm.watch($scope, function(parameters) {
-          rigid.setEulerAngles([0, parameters.theta0.value, parameters.phi0.value, parameters.psi0.value]);
+          rigid.setEulerAngles([0, parameters.theta.value, parameters.phi.value, parameters.psi.value]);
         });
       };
       this.set = pm.set;
