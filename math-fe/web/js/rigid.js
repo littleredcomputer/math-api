@@ -207,8 +207,8 @@ angular.module('Rigid', ['ngMaterial', 'ngSanitize', 'cmServices'])
         psiDot0: {nameHtml: 'ψ&prime;<sub>0</sub>', min: -1, max: 1, step: 0.1, value: 0.1},
         t: {nameHtml: 't', min: 1, max: 100, step: 2, value: 25}
       };
-      var pm = new ParameterManager(this, '/api/sicm/rigid/evolve');
-      var graph = new GraphDraw({
+      var pm = new ParameterManager(this.parameters);
+      var graph = new GraphDraw(this, {
         element: 'rigid-graph',
         x: function(d) { return d[0]; },
         y_min: -Math.PI,
@@ -218,7 +218,8 @@ angular.module('Rigid', ['ngMaterial', 'ngSanitize', 'cmServices'])
           theta: {y: function(d) { return d[1]; }, color: '#400'},
           phi: {y: function(d) { return d[2]; }, color: '#040'},
           psi: {y: function(d) { return d[3]; }, color: '#004'}
-        }
+        },
+        endpoint: '/api/sicm/rigid/evolve'
       });
       this.busy = 0;
       this.init = function() {
@@ -231,7 +232,7 @@ angular.module('Rigid', ['ngMaterial', 'ngSanitize', 'cmServices'])
       this.go = function() {
         var dt = 1/60;
         console.log('dt computed as ', dt, 't', this.parameters.t.value);
-        pm.fetchAnimation({dt: dt, A: 1, B: Math.sqrt(2), C: 2}, function(data, parameters) {
+        graph.fetchAnimation({dt: dt, A: 1, B: Math.sqrt(2), C: 2}, function(data, parameters) {
           graph.draw(data, 0, parameters.t.value);
           return graph.animate(data, dt, rigid.setEulerAngles.bind(rigid));
         })

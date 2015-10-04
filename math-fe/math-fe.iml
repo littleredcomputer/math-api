@@ -14,7 +14,7 @@
     </facet>
     <facet type="google-app-engine" name="Google App Engine">
       <configuration>
-        <sdk-home-path>$MAVEN_REPOSITORY$/com/google/appengine/appengine-java-sdk/1.9.20/appengine-java-sdk/appengine-java-sdk-1.9.20</sdk-home-path>
+        <sdk-home-path>$USER_HOME$/Software/appengine-java-sdk-1.9.27/</sdk-home-path>
       </configuration>
     </facet>
   </component>
@@ -27,8 +27,8 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" scope="PROVIDED" name="AppEngine Dev 1.9.20" level="application_server_libraries" />
     <orderEntry type="library" name="com.google.guava:guava:18.0" level="project" />
-    <orderEntry type="library" name="com.google.appengine:appengine-api-1.0-sdk:1.9.20" level="project" />
     <orderEntry type="library" name="org.clojure:clojure:1.6.0" level="project" />
     <orderEntry type="library" name="Leiningen: javax.servlet/javax.servlet-api:3.1.0" level="project" />
+    <orderEntry type="library" name="Leiningen: com.google.appengine/appengine-api-1.0-sdk:1.9.27" level="project" />
   </component>
 </module>

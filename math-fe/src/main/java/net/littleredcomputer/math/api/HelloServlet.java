@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 public class HelloServlet extends HttpServlet {
-
+  // if we get rid of this, we should pull clojure out of the app manifest.
   @Override public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
     final IFn plus = Clojure.var("clojure.core", "+");
 

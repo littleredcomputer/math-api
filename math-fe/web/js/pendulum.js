@@ -23,13 +23,7 @@ function driven_pendulum() {
   }
 
   function diagram(parameters) {
-    var xa = Math.sin(parameters.theta0.value),
-      xA = dx_scale(xa),
-      ya = - Math.cos(parameters.theta0.value),
-      yA = dy_scale(ya);
-
-    strut.attr('x2', xA).attr('y2', yA);
-    bob.attr('cx', xA).attr('cy', yA);
+    animate([0, parameters.theta0.value, 0]);
   }
 
   function animate(datum) {
@@ -77,21 +71,6 @@ function double_pendulum() {
   }
 
   function diagram(parameters) {
-    //var l1 = parameters.l1.value,
-    //  l2 = 1 - l1,
-    //  m1 = parameters.m1.value,
-    //  m2 = 1 - m1,
-    //  xa = l1 * Math.sin(parameters.theta0.value),
-    //  xA = dx_scale(xa),
-    //  ya = - l1 * Math.cos(parameters.theta0.value),
-    //  yA = dy_scale(ya),
-    //  xB = dx_scale(xa + l2 * Math.sin(parameters.phi0.value)),
-    //  yB = dy_scale(ya - l2 * Math.cos(parameters.phi0.value));
-    //
-    //strut1.attr('x2', xA).attr('y2', yA);
-    //strut2.attr('x1', xA).attr('y1', yA).attr('x2', xB).attr('y2', yB);
-    //bob1.attr('cx', xA).attr('cy', yA).attr('r', m_scale(m1));
-    //bob2.attr('cx', xB).attr('cy', yB).attr('r', m_scale(m2));
     animate([0, parameters.theta0.value, parameters.phi0.value], parameters);
   }
 
@@ -145,7 +124,7 @@ angular.module('Pendulum', ['ngMaterial', 'ngSanitize', 'cmServices'])
     function($log, $scope, ParameterManager, GraphDraw) {
       var dp = driven_pendulum();
 
-      var graph = new GraphDraw({
+      var graph = new GraphDraw(this, {
         element: 'pendulum-graph',
         x: function(d) { return d[0]; },
         y_min: -Math.PI,
@@ -153,8 +132,8 @@ angular.module('Pendulum', ['ngMaterial', 'ngSanitize', 'cmServices'])
         wrap_pi: true,
         traces: {
           theta: {y: function(d) { return d[1]; }, color: '#f00'}
-
-        }
+        },
+        endpoint: '/api/sicm/pendulum/driven/evolve'
       });
       this.busy = 0;
       this.parameters = {
@@ -165,7 +144,7 @@ angular.module('Pendulum', ['ngMaterial', 'ngSanitize', 'cmServices'])
         A: {nameHtml: 'A', min: 0, max: 0.3, step: 0.05, value: 0.1},
         t: {nameHtml: 't', min: 1, max: 100, step: 2, value: 25}};
 
-      var pm = new ParameterManager(this, '/api/sicm/pendulum/driven/evolve');
+      var pm = new ParameterManager(this.parameters);
 
       this.init = function() {
         pm.watch($scope, dp.diagram);
@@ -174,7 +153,7 @@ angular.module('Pendulum', ['ngMaterial', 'ngSanitize', 'cmServices'])
       this.set = pm.set;
       this.go = function() {
         var dt = 1/60;
-        pm.fetchAnimation({dt: dt}, function(data, parameters) {
+        graph.fetchAnimation({dt: dt}, function(data, parameters) {
           dp.setup();
           graph.draw(data, 0, parameters.t.value);
           return graph.animate(data, dt, dp.animate);
@@ -183,8 +162,9 @@ angular.module('Pendulum', ['ngMaterial', 'ngSanitize', 'cmServices'])
     }])
   .controller('DoublePendulumCtrl', ['$log', '$scope', 'ParameterManager', 'GraphDraw',
     function($log, $scope, ParameterManager, GraphDraw) {
+      var self = this;
       var dp = double_pendulum();
-      var graph = new GraphDraw({
+      var graph = new GraphDraw(this, {
         element: 'pendulum-graph',
         x: function(d) { return d[0]; },
         y_min: -Math.PI,
@@ -193,9 +173,13 @@ angular.module('Pendulum', ['ngMaterial', 'ngSanitize', 'cmServices'])
         traces: {
           theta: {y: function(d) { return d[1]; }, color: '#400'},
           phi: {y: function(d) { return d[2]; }, color: '#040'}
-        }
+        },
+        endpoint: '/api/sicm/pendulum/double/evolve'
       });
       this.busy = 0;
+      this.f = function() {
+        return self.t;
+      }
       this.parameters = {
         l1: {nameHtml: 'l<sub>1</sub>', min: 0.1, max: 0.9, step: 0.1, value: 0.3 },
         m1: {nameHtml: 'm<sub>1</sub>', min: 0.1, max: 0.9, step: 0.1, value: 0.5 },
@@ -204,8 +188,10 @@ angular.module('Pendulum', ['ngMaterial', 'ngSanitize', 'cmServices'])
         phi0: {nameHtml: 'φ<sub>0</sub>', min: -3.1416, max: 3.1416, step: 0.1, value: -1},
         phiDot0: {nameHtml: 'φ&prime;<sub>0</sub>', min: -3, max: 3, step: 0.1, value: 0},
         g: {nameHtml: 'g', min: -2, max: 15, step: 0.1, value: 9.8},
-        t: {nameHtml: 't', min: 1, max: 100, step: 2, value: 25}};
-      var pm = new ParameterManager(this, '/api/sicm/pendulum/double/evolve');
+        t: {nameHtml: 't', min: 1, max: 100, step: 2, value: 25},
+        h: {nameHtml: 'h', min: 0, max: 1, step: 0.1, value: 0.2, hidden: true} // XXX experiment
+      };
+      var pm = new ParameterManager(this.parameters);
       this.init = function() {
         pm.watch($scope, dp.diagram);
         dp.setup();
@@ -213,7 +199,7 @@ angular.module('Pendulum', ['ngMaterial', 'ngSanitize', 'cmServices'])
       this.set = pm.set;
       this.go = function() {
         var dt = 1/60;
-        pm.fetchAnimation({
+        graph.fetchAnimation({
           dt: dt,
           l2: 1 - this.parameters.l1.value,
           m2: 1 - this.parameters.m1.value
@@ -221,7 +207,11 @@ angular.module('Pendulum', ['ngMaterial', 'ngSanitize', 'cmServices'])
           dp.setup();
           console.log('p', parameters);
           graph.draw(data, 0, parameters.t.value);
-          return graph.animate(data, dt, function(datum) { dp.animate(datum, parameters); });
+          return graph.animate(data, dt, function(datum) {
+            $scope.$apply(function () {
+              self.t = datum[0];
+              dp.animate(datum, parameters);
+            })});
         });
       };
     }]);

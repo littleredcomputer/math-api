@@ -1,12 +1,12 @@
 angular.module('cmServices', [])
-  .factory('ParameterManager', ['$log', '$interval', '$http', function($log, $interval, $http) {
-    var ParameterManager = function(controller, endpoint) {
-      this.controller = controller;
-      this.parameters = controller.parameters;
+  .factory('ParameterManager', ['$log', function($log) {
+    // do we even need this damn thing? Why don't we just set model values and let
+    // angular handle it?
+    var ParameterManager = function(parameters) {
+      this.parameters = parameters;
       angular.forEach(this.parameters, function(v) {
         v.default = v.value;
       }, this);
-      this.endpoint = endpoint;
       this.interval = undefined;
     };
 
@@ -22,6 +22,7 @@ angular.module('cmServices', [])
     };
 
     ParameterManager.prototype.set = function(ps) {
+      $log.debug('pm.set', ps);
       angular.forEach(this.parameters, function(v, k) {
         if (ps[k] !== undefined) {
           v.value = ps[k];
@@ -30,24 +31,43 @@ angular.module('cmServices', [])
         }
       }, this);
     };
-    // Arguably this doesn't belong here.
-    ParameterManager.prototype.fetchAnimation = function(extra_params, action) {
-      if (!this.endpoint) return;
+    return ParameterManager;
+  }])
+  .factory('GraphDraw', ['$interval', '$log', '$http', function($interval, $log, $http) {
+    var margin = { left: 40, right: 20, top: 20, bottom: 25 };
+    function id(x) { return x; }
+    function wrap_pi(angle) {
+      var pi = Math.PI;
+      var a = angle;
+      if (-pi > angle || angle >= pi) {
+        a = angle - 2 * pi * Math.floor(angle / 2.0 / pi);
+        a = a < pi ? a : a - 2 * pi;
+      }
+      return a;
+    }
+    var GraphDraw = function(controller, options) {
+      this.controller = controller;
+      this.options = options;
+    };
+
+    GraphDraw.prototype.fetchAnimation = function(extra_params, action) {
+      if (!this.options.endpoint) return;
       var self = this;
       if (this.interval) {
         $log.debug('cancelling interval');
         $interval.cancel(this.interval);
       }
       var url_params = {};
-      angular.forEach(this.parameters, function(value, name) {
+      angular.forEach(this.controller.parameters, function(value, name) {
         url_params[name] = value.value;
       });
       angular.extend(url_params, extra_params);
       ++self.controller.busy;
       $log.debug('busy', self.controller.busy);
-      $http.get(this.endpoint, {params: url_params})
+      $log.debug('get', this.options.endpoint, url_params);
+      $http.get(this.options.endpoint, {params: url_params})
         .success(function(data) {
-          self.interval = action(data, self.parameters);
+          self.interval = action(data, self.controller.parameters);
           self.interval.then(function() {
             $log.debug('interval complete');
             self.interval = undefined;
@@ -64,23 +84,6 @@ angular.module('cmServices', [])
           --self.controller.busy;
           $log.debug('busy', self.controller.busy);
         });
-    };
-    return ParameterManager;
-  }])
-  .factory('GraphDraw', ['$interval', '$log', function($interval, $log) {
-    var margin = { left: 40, right: 20, top: 20, bottom: 25 };
-    function id(x) { return x; }
-    function wrap_pi(angle) {
-      var pi = Math.PI;
-      var a = angle;
-      if (-pi > angle || angle >= pi) {
-        a = angle - 2 * pi * Math.floor(angle / 2.0 / pi);
-        a = a < pi ? a : a - 2 * pi;
-      }
-      return a;
-    }
-    var GraphDraw = function(options) {
-      this.options = options;
     };
 
     GraphDraw.prototype.draw = function(data, x_min, x_max) {
