@@ -156,7 +156,7 @@ angular.module('Pendulum', ['ngMaterial', 'ngSanitize', 'cmServices'])
         graph.fetchAnimation({dt: dt}, function(data, parameters) {
           dp.setup();
           graph.draw(data, 0, parameters.t.value);
-          return graph.animate(data, dt, dp.animate);
+          return graph.animate(data, dp.animate);
         });
       };
     }])
@@ -198,16 +198,14 @@ angular.module('Pendulum', ['ngMaterial', 'ngSanitize', 'cmServices'])
       };
       this.set = pm.set;
       this.go = function() {
-        var dt = 1/60;
         graph.fetchAnimation({
-          dt: dt,
           l2: 1 - this.parameters.l1.value,
           m2: 1 - this.parameters.m1.value
         }, function(data, parameters) {
           dp.setup();
           console.log('p', parameters);
           graph.draw(data, 0, parameters.t.value);
-          return graph.animate(data, dt, function(datum) {
+          return graph.animate(data, function(datum) {
             $scope.$apply(function () {
               self.t = datum[0];
               dp.animate(datum, parameters);

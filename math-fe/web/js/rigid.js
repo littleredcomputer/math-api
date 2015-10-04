@@ -230,11 +230,9 @@ angular.module('Rigid', ['ngMaterial', 'ngSanitize', 'cmServices'])
       };
       this.set = pm.set;
       this.go = function() {
-        var dt = 1/60;
-        console.log('dt computed as ', dt, 't', this.parameters.t.value);
-        graph.fetchAnimation({dt: dt, A: 1, B: Math.sqrt(2), C: 2}, function(data, parameters) {
+        graph.fetchAnimation({A: 1, B: Math.sqrt(2), C: 2}, function(data, parameters) {
           graph.draw(data, 0, parameters.t.value);
-          return graph.animate(data, dt, rigid.setEulerAngles.bind(rigid));
+          return graph.animate(data, rigid.setEulerAngles.bind(rigid));
         })
       }
     }])

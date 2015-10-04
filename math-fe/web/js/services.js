@@ -51,13 +51,19 @@ angular.module('cmServices', [])
     };
 
     GraphDraw.prototype.fetchAnimation = function(extra_params, action) {
-      if (!this.options.endpoint) return;
+      if (!this.options.endpoint) {
+        $log.error('no endpoint');
+        return;
+      }
+      var max_trace_points = 2000;
+      this.dt = Math.max((this.controller.parameters.t.value * Object.keys(this.options.traces).length) / max_trace_points, 1/60);
+      $log.debug('dt computed', this.dt);
       var self = this;
       if (this.interval) {
         $log.debug('cancelling interval');
         $interval.cancel(this.interval);
       }
-      var url_params = {};
+      var url_params = {dt: this.dt};
       angular.forEach(this.controller.parameters, function(value, name) {
         url_params[name] = value.value;
       });
@@ -135,7 +141,7 @@ angular.module('cmServices', [])
       });
     };
 
-    GraphDraw.prototype.animate = function(data, dt, action) {
+    GraphDraw.prototype.animate = function(data, action) {
       var i = 0;
       var dot_sets = [];
       angular.forEach(this.options.traces, function(trace, t) {
@@ -157,7 +163,7 @@ angular.module('cmServices', [])
       var t0 = new Date();
       var timer = $interval(function() {
         animate_step();
-      }, 1000 * dt, data.length, false);
+      }, 1000 * this.dt, data.length, false);
       timer.then(function() {
         var ms = new Date() - t0;
         $log.debug(data.length, 'points in', ms, 'msec', 1000 * data.length/ms, 'Hz');
