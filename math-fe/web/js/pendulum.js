@@ -63,7 +63,7 @@ angular.module('Pendulum', ['ngMaterial', 'ngSanitize', 'cmServices'])
           return graph.animate(data, function(datum) {
             self.t = datum[0];
             self.parameters.theta.value = datum[1];
-            self.y = datum[2];
+            self.y = -datum[2];
           });
         });
       };
