@@ -1,48 +1,3 @@
-
-function driven_pendulum() {
-  // plot the data in the graph canvas
-  var animation, strut, pivot, bob, dx_scale, dy_scale;
-
-  function setup() {
-    animation = document.getElementById('pendulum-animation');
-    strut = d3.select('#pendulum-frame #strut');
-    pivot = d3.select('#pendulum-frame #pivot');
-    bob = d3.select('#pendulum-frame #bob');
-
-    var cWidth = animation.clientWidth,
-      cHeight = animation.clientHeight,
-      smaller = Math.min(cWidth, cHeight);
-
-    dx_scale = d3.scale.linear().domain([-1.2, 1.2]).range([0, smaller]);
-    dy_scale = d3.scale.linear().domain([-1.2, 1.2]).range([smaller, 0]);
-    strut.attr('x1', dx_scale(0)).attr('y1', dx_scale(0));
-    pivot.attr('cx', dx_scale(0)).attr('cy', dy_scale(0));
-    d3.select('#pendulum-animation svg')
-      .attr('width', cWidth)
-      .attr('height', cHeight);
-  }
-
-  function diagram(parameters) {
-    animate([0, parameters.theta.value, 0]);
-  }
-
-  function animate(datum) {
-    var y1 = dy_scale(datum[2]),
-      x2 = dx_scale(Math.sin(datum[1])),
-      y2 = dy_scale(-Math.cos(datum[1]) + datum[2]);
-
-    pivot.attr('cy', y1);
-    strut.attr('y1', y1).attr('x2', x2).attr('y2', y2);
-    bob.attr('cx', x2).attr('cy', y2);
-  }
-
-  return {
-    setup: setup,
-    diagram: diagram,
-    animate: animate
-  };
-}
-
 angular.module('Pendulum', ['ngMaterial', 'ngSanitize', 'cmServices'])
   .config(function($mdThemingProvider) {
   })
@@ -62,13 +17,15 @@ angular.module('Pendulum', ['ngMaterial', 'ngSanitize', 'cmServices'])
   .directive('drivenPendulumAnimation', function() {
     return {
       restrict: 'E',
+      replace: true,
       templateUrl: '/templates/pendulum/driven-animation.html'
     };
   })
   .controller('DrivenPendulumCtrl', ['$log', '$scope', 'ParameterManager', 'GraphDraw',
     function($log, $scope, ParameterManager, GraphDraw) {
-      var dp = driven_pendulum();
-
+      var self = this;
+      this.y = 0;
+      this.t = 0;
       var graph = new GraphDraw(this, {
         element: 'pendulum-graph',
         x: function(d) { return d[0]; },
@@ -88,31 +45,35 @@ angular.module('Pendulum', ['ngMaterial', 'ngSanitize', 'cmServices'])
         g: {nameHtml: 'g', min: -2, max: 15, step: 0.1, value: 9.8},
         A: {nameHtml: 'A', min: 0, max: 0.3, step: 0.05, value: 0.1},
         t: {nameHtml: 't', min: 1, max: 100, step: 2, value: 25}};
-
-      var pm = new ParameterManager(this.parameters);
-
-      this.init = function() {
-        pm.watch($scope, dp.diagram);
-        dp.setup();
+      var p = self.parameters;
+      var defaults = {};
+      angular.forEach(p, function(value, key) {
+        defaults[key] = value.value;
+      });
+      this.set = function(dict) {
+        angular.forEach(Object.keys(p), function(key) {
+          p[key].value = dict[key] !== undefined ? dict[key] : defaults[key];
+        });
       };
-      this.set = pm.set;
+      this.x1 = function() { return Math.sin(p.theta.value); };
+      this.y1 = function() { return self.y + Math.cos(p.theta.value); };
       this.go = function() {
-        var dt = 1/60;
-        graph.fetchAnimation({dt: dt}, function(data, parameters) {
-          dp.setup();
+        graph.fetchAnimation({}, function(data, parameters) {
           graph.draw(data, 0, parameters.t.value);
-          return graph.animate(data, dp.animate);
+          return graph.animate(data, function(datum) {
+            self.t = datum[0];
+            self.parameters.theta.value = datum[1];
+            self.y = datum[2];
+          });
         });
       };
     }])
   .controller('DoublePendulumCtrl', ['$log', '$scope', 'GraphDraw',
     function($log, $scope, GraphDraw) {
-      var self = this; // XXX needed?
+      var self = this;
       this.parameters = {
-        // hm. maybe we could get away from namedHtml if we could just use the
-        // unicode characters we wanted. Then we could drop angular-sanitize
-        l1: {nameHtml: 'l&#x2081', min: 0.1, max: 0.9, step: 0.1, value: 0.3 },
-        m1: {nameHtml: 'm&#x2081', min: 0.1, max: 0.9, step: 0.1, value: 0.5 },
+        l1: {nameHtml: 'l&#x2081', min: 0.1, max: 0.9, step: 0.1, value: 0.3},
+        m1: {nameHtml: 'm&#x2081', min: 0.1, max: 0.9, step: 0.1, value: 0.5},
         theta: {nameHtml: 'θ&#x2080;', min: -3.1416, max: 3.1416, step: 0.1, value: 1},
         thetaDot: {nameHtml: 'θ&prime;&#x2080;', min: -3, max: 3, step: 0.1, value: 0},
         phi: {nameHtml: 'φ&#x2080;', min: -3.1416, max: 3.1416, step: 0.1, value: -1},
@@ -121,8 +82,17 @@ angular.module('Pendulum', ['ngMaterial', 'ngSanitize', 'cmServices'])
         t: {nameHtml: 't', min: 1, max: 100, step: 2, value: 25},
         h: {nameHtml: 'h', min: 0, max: 1, step: 0.1, value: 0.2, hidden: true} // XXX experiment
       };
-
       var p = self.parameters;
+      var defaults = {};
+      angular.forEach(p, function(value, key) {
+        defaults[key] = value.value;
+      });
+      this.set = function(dict) {
+        angular.forEach(Object.keys(p), function(key) {
+          p[key].value = dict[key] !== undefined ? dict[key] : defaults[key];
+        });
+      };
+
       this.x1 = function() { return p.l1.value * Math.sin(p.theta.value); };
       this.y1 = function() { return p.l1.value * Math.cos(p.theta.value); };
       this.x2 = function() { return self.x1() + (1-p.l1.value) * Math.sin(p.phi.value); };
@@ -153,8 +123,10 @@ angular.module('Pendulum', ['ngMaterial', 'ngSanitize', 'cmServices'])
           graph.draw(data, 0, parameters.t.value);
           return graph.animate(data, function(datum) {
             self.t = datum[0];
-            self.parameters.theta.value = datum[1];
-            self.parameters.phi.value = datum[2];
+            // BUG: we need to call wrap_pi around these arguments, so we'll have to make that
+            // a service.
+            p.theta.value = datum[1];
+            p.phi.value = datum[2];
           });
         });
       };
