@@ -21,8 +21,8 @@ angular.module('Pendulum', ['ngMaterial', 'ngSanitize', 'cmServices'])
       templateUrl: '/templates/pendulum/driven-animation.html'
     };
   })
-  .controller('DrivenPendulumCtrl', ['$log', '$scope', 'ParameterManager', 'GraphDraw',
-    function($log, $scope, ParameterManager, GraphDraw) {
+  .controller('DrivenPendulumCtrl', ['$log', '$scope', 'GraphDraw', 'wrap_pi',
+    function($log, $scope, GraphDraw, wrap_pi) {
       var self = this;
       this.y = 0;
       this.t = 0;
@@ -39,8 +39,8 @@ angular.module('Pendulum', ['ngMaterial', 'ngSanitize', 'cmServices'])
       });
       this.busy = 0;
       this.parameters = {
-        theta: {nameHtml: 'θ<sub>0</sub>', min: -3.1416, max: 3.1416, step: 0.1, value: 1},
-        thetaDot: {nameHtml: 'θ&prime;<sub>0</sub>', min: -3, max: 3, step: 0.1, value: 0},
+        theta: {nameHtml: 'θ&#x2080;', min: -3.1416, max: 3.1416, step: 0.1, value: 1},
+        thetaDot: {nameHtml: 'θ&prime;&#x2080;', min: -3, max: 3, step: 0.1, value: 0},
         omega: {nameHtml: 'ω', min: 0, max: 50, step: 0.1, value: 2*Math.sqrt(9.8)},
         g: {nameHtml: 'g', min: -2, max: 15, step: 0.1, value: 9.8},
         A: {nameHtml: 'A', min: 0, max: 0.3, step: 0.05, value: 0.1},
@@ -62,14 +62,14 @@ angular.module('Pendulum', ['ngMaterial', 'ngSanitize', 'cmServices'])
           graph.draw(data, 0, parameters.t.value);
           return graph.animate(data, function(datum) {
             self.t = datum[0];
-            self.parameters.theta.value = datum[1];
+            self.parameters.theta.value = wrap_pi(datum[1]);
             self.y = -datum[2];
           });
         });
       };
     }])
-  .controller('DoublePendulumCtrl', ['$log', '$scope', 'GraphDraw',
-    function($log, $scope, GraphDraw) {
+  .controller('DoublePendulumCtrl', ['$log', '$scope', 'GraphDraw', 'wrap_pi',
+    function($log, $scope, GraphDraw, wrap_pi) {
       var self = this;
       this.parameters = {
         l1: {nameHtml: 'l&#x2081', min: 0.1, max: 0.9, step: 0.1, value: 0.3},
@@ -125,8 +125,8 @@ angular.module('Pendulum', ['ngMaterial', 'ngSanitize', 'cmServices'])
             self.t = datum[0];
             // BUG: we need to call wrap_pi around these arguments, so we'll have to make that
             // a service.
-            p.theta.value = datum[1];
-            p.phi.value = datum[2];
+            p.theta.value = wrap_pi(datum[1]);
+            p.phi.value = wrap_pi(datum[2]);
           });
         });
       };

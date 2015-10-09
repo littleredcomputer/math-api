@@ -33,18 +33,18 @@ angular.module('cmServices', [])
     };
     return ParameterManager;
   }])
-  .factory('GraphDraw', ['$interval', '$log', '$http', function($interval, $log, $http) {
+  .constant('wrap_pi', function wrap_pi(angle) {
+    var pi = Math.PI;
+    var a = angle;
+    if (-pi > angle || angle >= pi) {
+      a = angle - 2 * pi * Math.floor(angle / 2.0 / pi);
+      a = a < pi ? a : a - 2 * pi;
+    }
+    return a;
+  })
+  .factory('GraphDraw', ['$interval', '$log', '$http', 'wrap_pi', function($interval, $log, $http, wrap_pi) {
     var margin = { left: 40, right: 20, top: 20, bottom: 25 };
     function id(x) { return x; }
-    function wrap_pi(angle) {
-      var pi = Math.PI;
-      var a = angle;
-      if (-pi > angle || angle >= pi) {
-        a = angle - 2 * pi * Math.floor(angle / 2.0 / pi);
-        a = a < pi ? a : a - 2 * pi;
-      }
-      return a;
-    }
     var GraphDraw = function(controller, options) {
       this.controller = controller;
       this.options = options;
