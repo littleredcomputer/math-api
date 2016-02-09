@@ -8,7 +8,7 @@
              [json :refer [wrap-json-response]]]
             [compojure.core :refer [defroutes GET]]
             [net.littleredcomputer.math.api.middleware :refer [log-params cached]]
-            [net.littleredcomputer.math.examples
+            [sicmutils.examples
              [driven-pendulum :as driven]
              [double-pendulum :as double]
              [rigid-rotation :as rigid]
@@ -50,5 +50,3 @@
                 log-params
                 wrap-json-response
                 (wrap-defaults api-defaults)))
-
-
